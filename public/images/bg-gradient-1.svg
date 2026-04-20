@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 722.39 382.13">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        isolation: isolate;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="0" y1="191.06" x2="722.39" y2="191.06" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#050a1c"/>
+      <stop offset="1" stop-color="#111d3b"/>
+    </linearGradient>
+  </defs>
+  <g class="cls-2">
+    <g id="logo_guidelines" data-name="logo guidelines">
+      <rect class="cls-1" y="0" width="722.39" height="382.13"/>
+    </g>
+  </g>
+</svg>
