@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import MemberstackProvider from "@/components/MemberstackProvider";
 import LayoutShell from "@/components/LayoutShell";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
         <MemberstackProvider>
           <LayoutShell>{children}</LayoutShell>
         </MemberstackProvider>
+        <Analytics />
       </body>
     </html>
   );
