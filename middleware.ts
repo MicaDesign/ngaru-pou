@@ -2,12 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const hasSession = !!request.cookies.get("_ms-mid")?.value;
+  console.log("Middleware cookies:", request.cookies.getAll());
+  console.log("Has _ms-mid:", request.cookies.has("_ms-mid"));
 
-  if (!hasSession) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
+  // Temporarily allow all requests through to confirm middleware is the bounce source
   return NextResponse.next();
 }
 
