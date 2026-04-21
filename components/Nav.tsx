@@ -78,7 +78,7 @@ export default function Nav() {
 
   return (
     <header className="header-border-shadow sticky top-0 z-[999] w-full bg-midnight-tidal">
-      <div className="site-container flex h-24 items-center justify-between gap-3">
+      <div className="flex h-24 items-center justify-between gap-3 px-6 md:px-10">
         <Link
           href="/"
           className="flex-shrink-0 transition-transform duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:scale-[1.05]"
