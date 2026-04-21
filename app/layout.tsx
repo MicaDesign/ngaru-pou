@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import MemberstackProvider from "@/components/MemberstackProvider";
 import LayoutShell from "@/components/LayoutShell";
 
@@ -39,6 +40,7 @@ export default function RootLayout({
           <LayoutShell>{children}</LayoutShell>
         </MemberstackProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
