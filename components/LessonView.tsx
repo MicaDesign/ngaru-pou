@@ -5,11 +5,14 @@ import { Play, Download, FileText } from "lucide-react";
 import LessonSidebar from "./LessonSidebar";
 import MarkCompleteButton from "./MarkCompleteButton";
 import AskKaiakoForm from "./AskKaiakoForm";
+import KaiakoReplies from "./KaiakoReplies";
 import type { Level, Lesson, ScheduleRow } from "@/lib/airtable";
 import {
   ensureProgressRecord,
   getCompletedWeeksForLevel,
 } from "@/lib/progress";
+import { ensureStudentRegistered } from "@/lib/studentRegistry";
+import { getMemberstack } from "@/lib/memberstack";
 
 type Props = {
   level: Level;
@@ -96,6 +99,16 @@ export default function LessonView({ level, lessons, lesson }: Props) {
       levelSlug: level.slug,
       weekNumber: lesson.weekNumber,
     }).catch(() => {});
+
+    // Self-register the student in student_registry (idempotent).
+    const ms = getMemberstack();
+    if (ms) {
+      ms.getCurrentMember()
+        .then(({ data }: { data: Parameters<typeof ensureStudentRegistered>[0] }) => {
+          if (data) ensureStudentRegistered(data).catch(() => {});
+        })
+        .catch(() => {});
+    }
   }, [level.slug, lesson.id, lesson.weekNumber]);
 
   const isCurrentCompleted = completedWeeks.includes(lesson.weekNumber);
@@ -215,8 +228,17 @@ export default function LessonView({ level, lessons, lesson }: Props) {
                     ask the kaiako
                   </h2>
                 </div>
-                <AskKaiakoForm lessonId={lesson.id} />
+                <AskKaiakoForm
+                  lessonId={lesson.id}
+                  levelSlug={level.slug}
+                  weekNumber={lesson.weekNumber}
+                />
               </section>
+
+              <KaiakoReplies
+                levelSlug={level.slug}
+                weekNumber={lesson.weekNumber}
+              />
             </div>
           </main>
 

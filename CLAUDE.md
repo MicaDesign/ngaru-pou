@@ -61,7 +61,9 @@ A culturally grounded e-learning platform for Māori students. Built for a clien
 - app/page.tsx — homepage (composition of section components)
 - app/login/page.tsx — login page with full UX feedback states
 - app/signup/page.tsx — signup page with password strength, confirmation screen
-- app/dashboard/page.tsx — member dashboard (client-side protected via MemberStack SDK)
+- app/dashboard/page.tsx — server page that fetches levels + basic lessons and delegates to DashboardView (which renders the student or kaiako view based on plan)
+- app/dashboard/teacher/page.tsx — direct URL for the kaiako dashboard; renders TeacherDashboardView, which client-side gates to Kaiako plan members and redirects others to /dashboard
+- app/dashboard/levels/page.tsx — levels landing page (vertical stack of level cards pulling from Airtable)
 - app/dashboard/levels/[slug]/page.tsx — level overview page (server component, fetches Airtable data)
 - app/dashboard/levels/[slug]/lessons/[week]/page.tsx — lesson page with video placeholder, teal banner, sections, fixed left sidebar, sticky right schedule sidebar
 - app/verified/page.tsx — email verification success page
@@ -73,17 +75,26 @@ A culturally grounded e-learning platform for Māori students. Built for a clien
 - components/MemberstackProvider.tsx — MemberStack context provider
 - components/LayoutShell.tsx — hides Nav/Footer on login/signup/verified routes
 - components/AuthGuard.tsx — client wrapper that checks MemberStack on mount, redirects to /login if no member
+- components/DashboardView.tsx — client dashboard that branches on plan: student view (welcome hero, progress tracker) or TeacherDashboardView for Kaiako members
+- components/TeacherDashboardView.tsx — kaiako dashboard UI: teal hero, students section (aggregated from lesson_progress), and Ask the Kaiako inbox with reply form
+- components/LessonView.tsx — client wrapper for the lesson page that fetches progress and hands state to the sidebar and mark-complete button
 - components/LessonSidebar.tsx — fixed left lesson nav (flat list, per-item dividers, lock/completion states)
-- components/MarkCompleteButton.tsx — white pill button with teal check, UI-only until Phase 6
-- components/AskKaiakoForm.tsx — client form on the lesson page, UI-only until wired to messaging
+- components/MarkCompleteButton.tsx — white pill that writes to the lesson_progress Data Table via lib/progress
+- components/AskKaiakoForm.tsx — student form that writes to the kaiako_questions Data Table via lib/questions
 - components/HeroSection.tsx — homepage hero
 - components/KaupapaSection.tsx — "Our Kaupapa" 4-pillar section
 - components/IdentitySection.tsx — "For Rangatahi / For Whānau" section
 - components/EngageSection.tsx — "Engage. Learn. Achieve." feature grid
 - components/CommunitySection.tsx — "Supporting Tamariki" section
 - components/HeroCTAs.tsx — hero CTA buttons (client component)
-- lib/airtable.ts — server-side Airtable client with typed fetchers (getLevelBySlug, getLessonsForLevel, getLessonByWeek) and 5-min ISR caching
+- lib/airtable.ts — server-side Airtable client with typed fetchers (getLevelBySlug, getLessonsBasic, getLessonsForLevel, getLessonByWeek) and 5-min ISR caching
 - lib/memberstack.ts — MemberStack singleton client (lazy loaded, browser only)
+- lib/kaiako.ts — Kaiako plan ID constant + isKaiako(member) helper that inspects planConnections for an active connection to the kaiako plan
+- lib/progress.ts — lesson_progress Data Table client (getLessonProgress, getCompletedWeeksForLevel, ensureProgressRecord, markLessonComplete, getProgressByMemberId for the kaiako view). Writes `member_id` as a data field so the teacher can filter by student.
+- lib/studentRegistry.ts — student_registry Data Table client. ensureStudentRegistered(member) runs on every student's dashboard/lesson visit and creates a row if one doesn't exist; getStudents() returns the full roster for the teacher dashboard.
+- lib/teacherMembers.ts — client fetcher for /api/teacher/members. Returns the authoritative member list from the MemberStack Admin REST API (names + emails + plans).
+- app/api/teacher/members/route.ts — server route that calls the MemberStack Admin REST API with X-API-KEY auth. Verifies the caller is Kaiako via GET /members/{id}, then returns GET /members for the teacher dashboard roster.
+- lib/questions.ts — kaiako_questions Data Table client (createQuestion from the student form, getUnansweredQuestions / getAllQuestions / answerQuestion / getAnsweredQuestionsForLesson)
 - middleware.ts — passthrough only (auth protection is client-side via MemberStack SDK)
 - public/images/ — logo SVGs and site images
 - public/fonts/ — self-hosted font files
@@ -92,16 +103,24 @@ A culturally grounded e-learning platform for Māori students. Built for a clien
 Required in .env.local (never commit this file):
 - NEXT_PUBLIC_MEMBERSTACK_KEY=pk_b262170f0a74caaa56d4
 - AIRTABLE_TOKEN=<personal access token> — server-side only, no NEXT_PUBLIC prefix (used by lib/airtable.ts in server components)
+- MEMBERSTACK_SECRET_KEY=<secret key from MemberStack Dev Tools> — server-side only, used by `app/api/teacher/members/route.ts` to call the Admin REST API with `X-API-KEY` auth
 
-Also set both in Vercel dashboard: Settings → Environment Variables (required for the level and lesson pages to work in production)
+Also set all three in Vercel dashboard: Settings → Environment Variables (required for the level pages, lesson pages, and teacher roster to work in production)
 
 ## Services & Credentials
 - MemberStack: app.memberstack.com
   - Plan: Basic 2.0
   - Public key: pk_b262170f0a74caaa56d4
-  - Free Plan ID: pln_free-plan-gt6r0336
+  - Free Plan ID (student): pln_free-plan-gt6r0336 — auto-assigned on signup
+  - Kaiako Plan ID (teacher): pln_kaiako-4gi90evx — when active on a member, the dashboard renders the teacher view
   - Auth is CLIENT-SIDE only — MemberStack uses localStorage not cookies
   - Protected pages check auth via getMemberstack().getCurrentMember() on mount
+  - Data Tables (configure in MemberStack admin):
+    - `lesson_progress` — fields: lesson_id (text), level_slug (text), week_number (number), completed (boolean), completed_at (text), reflection_answers (text), **member_id (text)** — the student's MemberStack ID, written explicitly on create so the Kaiako can filter records with `where: { member_id: { equals: id } }`. Read rule must permit Kaiako plan members to read across members (e.g. "Any Member" read) so the teacher dashboard can see each student's progress.
+    - `kaiako_questions` — fields: student_id (text), student_name (text), student_email (text), level_slug (text), week_number (number), question (text), answered (boolean), answer (text). Create rule: any authenticated member. Read rule: Kaiako plan members read all; students read their own. Update rule: Kaiako plan members can update all (to post answers).
+    - `student_registry` — fields: member_id (text), first_name (text), last_name (text), email (text). Read rule: **Any Member** (so the Kaiako can see the full student roster). Create rule: any authenticated member. Students self-register on their first visit to `/dashboard` or any lesson page via `ensureStudentRegistered` in `lib/studentRegistry.ts` (idempotent — checks for an existing row before creating). Teachers are skipped.
+  - **Admin REST API** — auth is `X-API-KEY: <MEMBERSTACK_SECRET_KEY>` (NOT `Authorization: Bearer <key>` — Bearer returns `validation/invalid-secret-key` on this plan). Used by `app/api/teacher/members/route.ts` to fetch the authoritative member roster at `GET https://admin.memberstack.com/members`. The route also calls `GET /members/{id}` to verify the caller is on the Kaiako plan before returning data. `lib/teacherMembers.ts` is the client fetcher (sends `x-member-id` header).
+  - **Admin API has NO Data Tables endpoint** — `GET /data-tables/{key}/rows` returns `Cannot GET`. That's why all Data Table reads stay client-side via the DOM SDK. Teacher-side progress aggregation works by: (1) reading the `student_registry` table (Any Member read) to get every student ID, then (2) calling `getProgressByMemberId(id)` per student via DOM SDK. This works because the `lesson_progress` read rule is "Any Member" and each record carries a `member_id` data field for filtering.
 - Airtable: airtable.com — curriculum CMS
   - Base ID: appZBCAC2qH9bFOaG
   - Tables:
@@ -143,9 +162,10 @@ Also set both in Vercel dashboard: Settings → Environment Variables (required 
   - AuthGuard client wrapper protects both routes via existing MemberStack pattern
   - Branded 404 page at /not-found with centred koru mark and diagonal SVG accents
   - Publish gate (!lesson.isPublished → 404) temporarily bypassed during content fill-in; restore when Airtable "Is Published" is set
-- 🔜 Phase 5: Vimeo video embeds on lesson pages (replace the placeholder, pull Vimeo URL + caption file from Airtable Videos table)
-- 🔜 Phase 6: Progress tracking via MemberStack custom fields (wire Mark Complete button + completedWeeks prop on LessonSidebar)
-- 🔜 Phase 7: Full dashboard — enrolled courses, progress, next lesson
+- ✅ Phase 6: Progress tracking via MemberStack Data Tables (`lesson_progress`). Mark Complete writes `completed`/`completed_at`/`member_id`; LessonSidebar shows green dots for completed weeks; LessonView seeds records on mount via `ensureProgressRecord` (also backfills missing `member_id` on legacy rows).
+- ✅ Phase 7: Student dashboard at /dashboard. Two states — "Get started" hero + level mini-cards for members with no progress; teal "welcome back" banner + current-level lesson list with "Continue learning →" CTA and per-lesson completion dots for members with progress. Server fetches all levels + basic lessons; client fetches `getCompletedWeeksForLevel` per level.
+- ✅ Phase 8: Kaiako (teacher) dashboard at /dashboard/teacher (plan-gated). DashboardView auto-routes Kaiako members to the teacher view. Two sections side-by-side (50/50 grid): Students (registry + admin-API identity, per-student progress via `getProgressByMemberId` → per-level teal pill + Airtable thumbnail + link to `/dashboard/levels/[slug]`) and Ask the Kaiako inbox (read/answer `kaiako_questions`, updates flip records to `answered:true` with teacher reply). Students see replies on the matching lesson page via KaiakoReplies. `app/api/teacher/members` pulls the authoritative roster from the MemberStack Admin REST API with `X-API-KEY` auth.
+- 🔜 Phase 5: Vimeo video embeds on lesson pages (replace the placeholder, pull Vimeo URL + caption file from Airtable Videos table) — deferred, content not yet available
 
 ## Coding Conventions
 - Always use named Tailwind colour tokens, never raw hex

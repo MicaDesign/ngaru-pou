@@ -56,6 +56,20 @@ export type Video = {
   durationSeconds: number;
 };
 
+export type LessonBasic = {
+  id: string;
+  title: string;
+  weekNumber: number;
+  bracketBeingTaught: string;
+  warmUp: string;
+  objectives: string;
+  keyFeatures: string;
+  keyVocabulary: string;
+  teacherNotes: string;
+  lyricsDownloadUrl: string;
+  isPublished: boolean;
+};
+
 export type Lesson = {
   id: string;
   title: string;
@@ -233,6 +247,14 @@ export async function getLevelBySlug(slug: string): Promise<Level | null> {
     maxRecords: "1",
   });
   return records.length ? parseLevel(records[0]) : null;
+}
+
+export async function getLessonsBasic(level: Level): Promise<LessonBasic[]> {
+  if (!level.lessonIds.length) return [];
+  const records = await fetchByIds(TABLES.lessons, level.lessonIds);
+  return records
+    .map(parseLessonBase)
+    .sort((a, b) => a.weekNumber - b.weekNumber);
 }
 
 export async function getLessonsForLevel(level: Level): Promise<Lesson[]> {

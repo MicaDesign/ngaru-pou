@@ -3,10 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Menu,
   X,
   User,
+  ChevronDown,
   LayoutDashboard,
   BookOpen,
   LogOut,
@@ -41,11 +43,15 @@ function getDisplayName(member: Member): string {
 }
 
 export default function Nav() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [member, setMember] = useState<Member>(null);
   const [checking, setChecking] = useState(true);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
 
   useEffect(() => {
     const ms = getMemberstack();
@@ -87,9 +93,15 @@ export default function Nav() {
         onClick={() => setUserMenuOpen((v) => !v)}
         aria-label="User menu"
         aria-expanded={userMenuOpen}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.08] hover:text-white"
+        className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/15 px-3 py-2 text-white/70 transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.08] hover:text-white"
       >
         <User size={18} />
+        <ChevronDown
+          size={16}
+          className={`transition-transform duration-200 ${
+            userMenuOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       {userMenuOpen && (
@@ -202,16 +214,30 @@ export default function Nav() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="group relative mx-[5px] inline-flex items-center justify-center rounded-lg border border-transparent px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white/50 transition-[color,background-color] duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.11] hover:text-white"
-            >
-              {link.label}
-              <span className="absolute bottom-1 left-3 right-3 h-px origin-left scale-x-0 bg-white transition-transform duration-300 ease-[cubic-bezier(.165,.84,.44,1)] group-hover:scale-x-100" />
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`group relative mx-[5px] inline-flex items-center justify-center rounded-lg border border-transparent px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold transition-[color,background-color] duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${
+                  active
+                    ? "text-white"
+                    : "text-white/50 hover:bg-white/[0.11] hover:text-white"
+                }`}
+              >
+                {link.label}
+                <span
+                  className={`absolute bottom-1 left-3 right-3 h-px origin-left transition-transform duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${
+                    active
+                      ? "scale-x-100 bg-primary"
+                      : "scale-x-0 bg-white group-hover:scale-x-100"
+                  }`}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="hidden md:flex items-center gap-3 min-w-[180px] justify-end">
@@ -229,16 +255,24 @@ export default function Nav() {
 
       {open && (
         <div className="md:hidden bg-midnight-tidal border-t border-white/[0.11] px-6 py-6 flex flex-col gap-4">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-white/70 hover:text-white text-base font-semibold transition-colors"
-              onClick={() => setOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`text-base font-semibold transition-colors ${
+                  active
+                    ? "text-white border-l-2 border-primary pl-3 -ml-3"
+                    : "text-white/70 hover:text-white"
+                }`}
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
           <div className="flex flex-col gap-3 pt-3 border-t border-white/[0.11]">
             {mobileAuthButtons}
           </div>

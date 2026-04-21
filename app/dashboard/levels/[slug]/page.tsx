@@ -1,10 +1,17 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Lock, ArrowRight } from "lucide-react";
 import AuthGuard from "@/components/AuthGuard";
 import { getLevelBySlug, getLessonsForLevel } from "@/lib/airtable";
 
 type Props = { params: { slug: string } };
+
+// Mirrors the placeholder set used on the levels landing page.
+const PLACEHOLDER_IMAGES = [
+  "/images/maori-kapa-haka-group.avif",
+  "/images/3-moari-girls.avif",
+];
 
 export default async function LevelPage({ params }: Props) {
   const level = await getLevelBySlug(params.slug);
@@ -29,35 +36,55 @@ export default async function LevelPage({ params }: Props) {
             ← back to dashboard
           </Link>
 
-          <div className="mt-6 flex items-baseline gap-4 flex-wrap">
-            <h1 className="font-display text-5xl md:text-6xl text-white">
-              {level.name}
-            </h1>
-            {level.ageRange && (
-              <span className="font-sans text-sm text-primary bg-primary/10 rounded-full px-3 py-1">
-                {level.ageRange}
-              </span>
-            )}
-          </div>
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-5 md:items-start gap-8 md:gap-10">
+            <div className="md:col-span-2 relative aspect-square rounded-xl overflow-hidden bg-iron-depth">
+              <Image
+                src={
+                  level.thumbnail?.[0]?.url ??
+                  PLACEHOLDER_IMAGES[
+                    level.order
+                      ? (level.order - 1) % PLACEHOLDER_IMAGES.length
+                      : 0
+                  ]
+                }
+                alt=""
+                fill
+                sizes="(max-width: 768px) 100vw, 40vw"
+                className="object-contain"
+                priority
+              />
+            </div>
 
-          {level.objectives && (
-            <div className="mt-12 grid gap-10 md:grid-cols-2">
-              <div>
-                <h2 className="font-display text-2xl text-white mb-4">
-                  objectives
-                </h2>
-                <ul className="space-y-2">
-                  {bullets(level.objectives).map((item, i) => (
-                    <li
-                      key={i}
-                      className="font-sans text-white/70 leading-relaxed flex gap-3"
-                    >
-                      <span className="text-primary shrink-0">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+            <div className="md:col-span-3 flex flex-col gap-8">
+              <div className="flex items-baseline gap-4 flex-wrap">
+                <h1 className="font-display text-5xl md:text-6xl text-white">
+                  {level.name}
+                </h1>
+                {level.ageRange && (
+                  <span className="font-sans text-sm text-primary bg-primary/10 rounded-full px-3 py-1">
+                    {level.ageRange}
+                  </span>
+                )}
               </div>
+
+              {level.objectives && (
+                <div>
+                  <h2 className="font-display text-2xl text-white mb-4">
+                    objectives
+                  </h2>
+                  <ul className="space-y-2">
+                    {bullets(level.objectives).map((item, i) => (
+                      <li
+                        key={i}
+                        className="font-sans text-white/70 leading-relaxed flex gap-3"
+                      >
+                        <span className="text-primary shrink-0">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {level.keyFeatures && (
                 <div>
@@ -78,7 +105,7 @@ export default async function LevelPage({ params }: Props) {
                 </div>
               )}
             </div>
-          )}
+          </div>
 
           <div className="mt-16">
             <h2 className="font-display text-3xl text-white mb-6">lessons</h2>
