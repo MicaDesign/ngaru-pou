@@ -1,24 +1,50 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useMember } from "@/components/MemberstackProvider";
+import { Loader2 } from "lucide-react";
 import { getMemberstack } from "@/lib/memberstack";
 
+type Member = {
+  id: string;
+  auth: { email: string };
+  customFields?: Record<string, string>;
+} | null;
+
 export default function DashboardPage() {
-  const { member, isLoading } = useMember();
-  const router = useRouter();
+  const [member, setMember] = useState<Member>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    const ms = getMemberstack();
+    if (!ms) {
+      window.location.href = "/login";
+      return;
+    }
+    ms.getCurrentMember()
+      .then(({ data }: { data: Member }) => {
+        if (!data) {
+          window.location.href = "/login";
+        } else {
+          setMember(data);
+          setChecking(false);
+        }
+      })
+      .catch(() => {
+        window.location.href = "/login";
+      });
+  }, []);
 
   async function handleLogout() {
     const ms = getMemberstack();
     if (ms) await ms.logout();
-    router.push("/login");
+    window.location.href = "/login";
   }
 
-  if (isLoading) {
+  if (checking) {
     return (
-      <div className="min-h-[calc(100vh-6rem)] bg-midnight-tidal flex items-center justify-center">
-        <p className="text-white/40 font-sans text-sm">Loading…</p>
+      <div className="min-h-screen bg-midnight-tidal flex items-center justify-center">
+        <Loader2 size={28} className="text-white/30 animate-spin" />
       </div>
     );
   }

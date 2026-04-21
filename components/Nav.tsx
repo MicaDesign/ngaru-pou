@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { getMemberstack } from "@/lib/memberstack";
 
 const navLinks = [
   { label: "Lessons", href: "/lessons" },
@@ -12,7 +13,68 @@ const navLinks = [
 ];
 
 export default function Nav() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]       = useState(false);
+  const [member, setMember]   = useState<unknown>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    const ms = getMemberstack();
+    if (!ms) { setChecking(false); return; }
+    ms.getCurrentMember()
+      .then(({ data }: { data: unknown }) => setMember(data))
+      .catch(() => setMember(null))
+      .finally(() => setChecking(false));
+  }, []);
+
+  async function handleLogout() {
+    const ms = getMemberstack();
+    if (ms) await ms.logout();
+    window.location.href = "/";
+  }
+
+  const authButtons = checking ? null : member ? (
+    <>
+      <Link
+        href="/dashboard"
+        className="inline-flex h-8 items-center rounded-lg px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white/50 transition-[color,background-color] duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.11] hover:text-white"
+      >
+        Dashboard
+      </Link>
+      <button
+        onClick={handleLogout}
+        className="inline-flex h-8 items-center rounded-lg bg-primary px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-primary-light"
+      >
+        Log Out
+      </button>
+    </>
+  ) : (
+    <>
+      <Link
+        href="/login"
+        className="inline-flex h-8 items-center rounded-lg px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white/50 transition-[color,background-color] duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.11] hover:text-white"
+      >
+        Login
+      </Link>
+      <Link
+        href="/signup"
+        className="inline-flex h-8 items-center rounded-lg bg-primary px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-primary-light"
+      >
+        Sign Up
+      </Link>
+    </>
+  );
+
+  const mobileAuthButtons = checking ? null : member ? (
+    <>
+      <Link href="/dashboard" className="text-white/70 hover:text-white text-base font-semibold transition-colors" onClick={() => setOpen(false)}>Dashboard</Link>
+      <button onClick={handleLogout} className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300">Log Out</button>
+    </>
+  ) : (
+    <>
+      <Link href="/login" className="text-white/70 hover:text-white text-base font-semibold transition-colors" onClick={() => setOpen(false)}>Login</Link>
+      <Link href="/signup" className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300" onClick={() => setOpen(false)}>Sign Up</Link>
+    </>
+  );
 
   return (
     <header className="header-border-shadow sticky top-0 z-[999] w-full bg-midnight-tidal">
@@ -44,19 +106,8 @@ export default function Nav() {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Link
-            href="/login"
-            className="inline-flex h-8 items-center rounded-lg px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white/50 transition-[color,background-color] duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.11] hover:text-white"
-          >
-            Login
-          </Link>
-          <Link
-            href="/signup"
-            className="inline-flex h-8 items-center rounded-lg bg-primary px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-primary-light"
-          >
-            Sign Up
-          </Link>
+        <div className="hidden md:flex items-center gap-3 min-w-[180px] justify-end">
+          {authButtons}
         </div>
 
         <button
@@ -68,7 +119,6 @@ export default function Nav() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-midnight-tidal border-t border-white/[0.11] px-6 py-6 flex flex-col gap-4">
           {navLinks.map((link) => (
@@ -82,8 +132,7 @@ export default function Nav() {
             </Link>
           ))}
           <div className="flex flex-col gap-3 pt-3 border-t border-white/[0.11]">
-            <Link href="/login" className="text-white/70 hover:text-white text-base font-semibold" onClick={() => setOpen(false)}>Login</Link>
-            <Link href="/signup" className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300" onClick={() => setOpen(false)}>Sign Up</Link>
+            {mobileAuthButtons}
           </div>
         </div>
       )}
