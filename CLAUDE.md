@@ -62,19 +62,27 @@ A culturally grounded e-learning platform for Māori students. Built for a clien
 - app/login/page.tsx — login page with full UX feedback states
 - app/signup/page.tsx — signup page with password strength, confirmation screen
 - app/dashboard/page.tsx — member dashboard (client-side protected via MemberStack SDK)
+- app/dashboard/levels/[slug]/page.tsx — level overview page (server component, fetches Airtable data)
+- app/dashboard/levels/[slug]/lessons/[week]/page.tsx — lesson page with video placeholder, teal banner, sections, fixed left sidebar, sticky right schedule sidebar
 - app/verified/page.tsx — email verification success page
+- app/not-found.tsx — branded 404 page with centred koru mark and diagonal accent lines
 - components/ — reusable UI components
 - components/Nav.tsx — site navigation (shows different buttons when logged in vs out)
 - components/Footer.tsx — site footer
 - components/Button.tsx — primary/ghost button variants
 - components/MemberstackProvider.tsx — MemberStack context provider
 - components/LayoutShell.tsx — hides Nav/Footer on login/signup/verified routes
+- components/AuthGuard.tsx — client wrapper that checks MemberStack on mount, redirects to /login if no member
+- components/LessonSidebar.tsx — fixed left lesson nav (flat list, per-item dividers, lock/completion states)
+- components/MarkCompleteButton.tsx — white pill button with teal check, UI-only until Phase 6
+- components/AskKaiakoForm.tsx — client form on the lesson page, UI-only until wired to messaging
 - components/HeroSection.tsx — homepage hero
 - components/KaupapaSection.tsx — "Our Kaupapa" 4-pillar section
 - components/IdentitySection.tsx — "For Rangatahi / For Whānau" section
 - components/EngageSection.tsx — "Engage. Learn. Achieve." feature grid
 - components/CommunitySection.tsx — "Supporting Tamariki" section
 - components/HeroCTAs.tsx — hero CTA buttons (client component)
+- lib/airtable.ts — server-side Airtable client with typed fetchers (getLevelBySlug, getLessonsForLevel, getLessonByWeek) and 5-min ISR caching
 - lib/memberstack.ts — MemberStack singleton client (lazy loaded, browser only)
 - middleware.ts — passthrough only (auth protection is client-side via MemberStack SDK)
 - public/images/ — logo SVGs and site images
@@ -83,8 +91,9 @@ A culturally grounded e-learning platform for Māori students. Built for a clien
 ## Environment Variables
 Required in .env.local (never commit this file):
 - NEXT_PUBLIC_MEMBERSTACK_KEY=pk_b262170f0a74caaa56d4
+- AIRTABLE_TOKEN=<personal access token> — server-side only, no NEXT_PUBLIC prefix (used by lib/airtable.ts in server components)
 
-Also set in Vercel dashboard: Settings → Environment Variables
+Also set both in Vercel dashboard: Settings → Environment Variables (required for the level and lesson pages to work in production)
 
 ## Services & Credentials
 - MemberStack: app.memberstack.com
@@ -93,7 +102,15 @@ Also set in Vercel dashboard: Settings → Environment Variables
   - Free Plan ID: pln_free-plan-gt6r0336
   - Auth is CLIENT-SIDE only — MemberStack uses localStorage not cookies
   - Protected pages check auth via getMemberstack().getCurrentMember() on mount
-- Airtable: airtable.com — base not yet created
+- Airtable: airtable.com — curriculum CMS
+  - Base ID: appZBCAC2qH9bFOaG
+  - Tables:
+    - Levels — tbltrJGgs5RvZ552v (one record per level: Te Pūmanawa, Te Pūkenga Rau, Te Pūkenga)
+    - Lessons — tblX7NElxtfGi9O4F (10 per level; links to Level, Lesson Schedule, Videos; "Is Published" checkbox gates access)
+    - Lesson Schedule — tbli6ErkVxCQzmxj8 (timed rows per lesson, ~8 per lesson)
+    - Videos — tbluk5AFITvkim2DS (one+ per lesson; Vimeo URL, duration, caption file, reflection prompts)
+    - Reflection Prompts — tbla4etpK0iy11Asa (linked to a video; answered for attendance)
+  - Auth: personal access token in AIRTABLE_TOKEN (server-side only)
 - Vimeo: vimeo.com — account exists, not yet integrated
 - Vercel: vercel.com — project: ngaru-pou under Mica Design team
 
@@ -118,9 +135,15 @@ Also set in Vercel dashboard: Settings → Environment Variables
   - Client-side route protection on dashboard
   - Free Plan auto-assigned on signup
   - Nav shows different buttons when logged in vs logged out
-- 🔜 Phase 4: Airtable integration — pull curriculum (courses, modules, lessons)
-- 🔜 Phase 5: Vimeo video embeds on lesson pages
-- 🔜 Phase 6: Progress tracking via MemberStack custom fields
+- ✅ Phase 4: Airtable integration — level and lesson pages live
+  - lib/airtable.ts with typed fetchers, batched record-ID queries, 5-min ISR caching
+  - Level overview page at /dashboard/levels/[slug] with lesson grid + locked states
+  - Lesson page at /dashboard/levels/[slug]/lessons/[week] — fixed left sidebar, teal rounded banner with Mark Complete pill button, video placeholder, objectives/key features/vocabulary/teacher notes, sticky right schedule sidebar, Ask the Kaiako form
+  - AuthGuard client wrapper protects both routes via existing MemberStack pattern
+  - Branded 404 page at /not-found with centred koru mark and diagonal SVG accents
+  - Publish gate (!lesson.isPublished → 404) temporarily bypassed during content fill-in; restore when Airtable "Is Published" is set
+- 🔜 Phase 5: Vimeo video embeds on lesson pages (replace the placeholder, pull Vimeo URL + caption file from Airtable Videos table)
+- 🔜 Phase 6: Progress tracking via MemberStack custom fields (wire Mark Complete button + completedWeeks prop on LessonSidebar)
 - 🔜 Phase 7: Full dashboard — enrolled courses, progress, next lesson
 
 ## Coding Conventions
