@@ -1,30 +1,77 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import {
+  Menu,
+  X,
+  User,
+  LayoutDashboard,
+  BookOpen,
+  LogOut,
+} from "lucide-react";
 import { getMemberstack } from "@/lib/memberstack";
 
 const navLinks = [
-  { label: "Lessons", href: "/lessons" },
+  { label: "Levels", href: "/dashboard/levels" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About Us", href: "/about-us" },
 ];
 
+type Member = {
+  auth?: { email?: string };
+  customFields?: Record<string, unknown>;
+} | null;
+
+function pickString(src: Record<string, unknown> | undefined, ...keys: string[]) {
+  if (!src) return "";
+  for (const k of keys) {
+    const v = src[k];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return "";
+}
+
+function getDisplayName(member: Member): string {
+  const first = pickString(member?.customFields, "first-name", "firstName");
+  const last = pickString(member?.customFields, "last-name", "lastName");
+  const full = [first, last].filter(Boolean).join(" ");
+  return full || member?.auth?.email || "Member";
+}
+
 export default function Nav() {
-  const [open, setOpen]       = useState(false);
-  const [member, setMember]   = useState<unknown>(null);
+  const [open, setOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [member, setMember] = useState<Member>(null);
   const [checking, setChecking] = useState(true);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ms = getMemberstack();
-    if (!ms) { setChecking(false); return; }
+    if (!ms) {
+      setChecking(false);
+      return;
+    }
     ms.getCurrentMember()
-      .then(({ data }: { data: unknown }) => setMember(data))
+      .then(({ data }: { data: Member }) => setMember(data))
       .catch(() => setMember(null))
       .finally(() => setChecking(false));
   }, []);
+
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node)
+      ) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [userMenuOpen]);
 
   async function handleLogout() {
     const ms = getMemberstack();
@@ -32,21 +79,59 @@ export default function Nav() {
     window.location.href = "/";
   }
 
+  const displayName = getDisplayName(member);
+
   const authButtons = checking ? null : member ? (
-    <>
-      <Link
-        href="/dashboard"
-        className="inline-flex h-8 items-center rounded-lg px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white/50 transition-[color,background-color] duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.11] hover:text-white"
-      >
-        Dashboard
-      </Link>
+    <div ref={userMenuRef} className="relative">
       <button
-        onClick={handleLogout}
-        className="inline-flex h-8 items-center rounded-lg bg-primary px-3 py-[0.4rem] font-sans text-[1.1rem] font-semibold text-white transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-primary-light"
+        onClick={() => setUserMenuOpen((v) => !v)}
+        aria-label="User menu"
+        aria-expanded={userMenuOpen}
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.08] hover:text-white"
       >
-        Log Out
+        <User size={18} />
       </button>
-    </>
+
+      {userMenuOpen && (
+        <div className="animate-fade-up absolute right-0 top-12 w-60 overflow-hidden rounded-xl border border-white/10 bg-iron-depth shadow-xl">
+          <div className="border-b border-white/10 px-4 py-3">
+            <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-white/40">
+              Signed in as
+            </p>
+            <p className="mt-0.5 truncate font-sans text-sm text-white/85">
+              {displayName}
+            </p>
+          </div>
+
+          <Link
+            href="/dashboard"
+            onClick={() => setUserMenuOpen(false)}
+            className="flex items-center gap-3 px-4 py-3 font-sans text-sm text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white"
+          >
+            <LayoutDashboard size={16} />
+            View dashboard
+          </Link>
+          <Link
+            href="/dashboard/levels"
+            onClick={() => setUserMenuOpen(false)}
+            className="flex items-center gap-3 px-4 py-3 font-sans text-sm text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white"
+          >
+            <BookOpen size={16} />
+            Levels
+          </Link>
+
+          <div className="border-t border-white/10" />
+
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 px-4 py-3 font-sans text-sm text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white"
+          >
+            <LogOut size={16} />
+            Log out
+          </button>
+        </div>
+      )}
+    </div>
   ) : (
     <>
       <Link
@@ -66,13 +151,36 @@ export default function Nav() {
 
   const mobileAuthButtons = checking ? null : member ? (
     <>
-      <Link href="/dashboard" className="text-white/70 hover:text-white text-base font-semibold transition-colors" onClick={() => setOpen(false)}>Dashboard</Link>
-      <button onClick={handleLogout} className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300">Log Out</button>
+      <Link
+        href="/dashboard"
+        className="text-white/70 hover:text-white text-base font-semibold transition-colors"
+        onClick={() => setOpen(false)}
+      >
+        Dashboard
+      </Link>
+      <button
+        onClick={handleLogout}
+        className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300"
+      >
+        Log Out
+      </button>
     </>
   ) : (
     <>
-      <Link href="/login" className="text-white/70 hover:text-white text-base font-semibold transition-colors" onClick={() => setOpen(false)}>Login</Link>
-      <Link href="/signup" className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300" onClick={() => setOpen(false)}>Sign Up</Link>
+      <Link
+        href="/login"
+        className="text-white/70 hover:text-white text-base font-semibold transition-colors"
+        onClick={() => setOpen(false)}
+      >
+        Login
+      </Link>
+      <Link
+        href="/signup"
+        className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300"
+        onClick={() => setOpen(false)}
+      >
+        Sign Up
+      </Link>
     </>
   );
 

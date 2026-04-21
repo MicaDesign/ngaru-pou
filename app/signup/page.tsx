@@ -176,7 +176,7 @@ export default function SignupPage() {
         email,
         password,
         plans: [{ planId: "pln_free-plan-gt6r0336" }],
-        customFields: { firstName, lastName },
+        customFields: { "first-name": firstName, "last-name": lastName },
       });
       setSignupDone(true);
     } catch (err: unknown) {

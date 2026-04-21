@@ -49,7 +49,8 @@ export default function DashboardPage() {
     );
   }
 
-  const displayName = member?.customFields?.firstName || null;
+  const displayName =
+    member?.customFields?.["first-name"] || member?.auth?.email || null;
 
   return (
     <div className="min-h-[calc(100vh-6rem)] bg-midnight-tidal">

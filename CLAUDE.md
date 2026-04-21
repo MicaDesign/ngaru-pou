@@ -123,6 +123,7 @@ Also set both in Vercel dashboard: Settings → Environment Variables (required 
   if (!member) window.location.href = "/login"
 - Always use window.location.href for auth redirects (not router.push)
 - Free Plan is auto-assigned on signup via plans: [{ planId: "pln_free-plan-gt6r0336" }]
+- Custom field keys use hyphenated format — MemberStack stores them as `first-name` and `last-name` (not `firstName`/`lastName`). Always read them via bracket access: `member?.customFields?.["first-name"]`. The signup page writes them with the hyphenated keys; every consumer must match.
 
 ## Build Phases
 - ✅ Phase 0: Developer tools installed (Node, Git, VS Code, GitHub Desktop, Claude Code)

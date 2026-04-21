@@ -15,10 +15,18 @@ type AirtableRecord = {
   fields: Record<string, unknown>;
 };
 
+export type Attachment = {
+  url: string;
+  filename?: string;
+  width?: number;
+  height?: number;
+};
+
 export type Level = {
   id: string;
   name: string;
   slug: string;
+  order?: number;
   ageRange: string;
   objectives: string;
   keyFeatures: string;
@@ -29,6 +37,7 @@ export type Level = {
   codeOfConductUrl: string;
   uniformPolicyUrl: string;
   handyHintsUrl: string;
+  thumbnail?: Attachment[];
   lessonIds: string[];
 };
 
@@ -74,6 +83,27 @@ function bool(v: unknown): boolean {
 }
 function ids(v: unknown): string[] {
   return Array.isArray(v) ? (v as string[]) : [];
+}
+
+function attachments(v: unknown): Attachment[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const result: Attachment[] = [];
+  for (const item of v) {
+    if (
+      item &&
+      typeof item === "object" &&
+      typeof (item as { url?: unknown }).url === "string"
+    ) {
+      const a = item as Record<string, unknown>;
+      result.push({
+        url: a.url as string,
+        filename: typeof a.filename === "string" ? a.filename : undefined,
+        width: typeof a.width === "number" ? a.width : undefined,
+        height: typeof a.height === "number" ? a.height : undefined,
+      });
+    }
+  }
+  return result.length ? result : undefined;
 }
 
 async function fetchRecords(
@@ -136,6 +166,7 @@ function parseLevel(r: AirtableRecord): Level {
     id: r.id,
     name: str(f["Name"]),
     slug: str(f["Slug"]),
+    order: typeof f["Order"] === "number" ? (f["Order"] as number) : undefined,
     ageRange: str(f["Age Range"]),
     objectives: str(f["Objectives"]),
     keyFeatures: str(f["Key Features"]),
@@ -146,6 +177,8 @@ function parseLevel(r: AirtableRecord): Level {
     codeOfConductUrl: str(f["Code of Conduct URL"]),
     uniformPolicyUrl: str(f["Uniform Policy URL"]),
     handyHintsUrl: str(f["Handy Hints URL"]),
+    // Thumbnail field — fldjESykB6IjuO4Pb (multipleAttachments)
+    thumbnail: attachments(f["Thumbnail"]),
     lessonIds: ids(f["Lessons"]),
   };
 }
@@ -188,7 +221,7 @@ function parseVideo(r: AirtableRecord): Video {
 
 export async function getLevels(): Promise<Level[]> {
   const records = await fetchRecords(TABLES.levels, {
-    sort: JSON.stringify([{ field: "Name", direction: "asc" }]),
+    sort: JSON.stringify([{ field: "Order", direction: "asc" }]),
   });
   return records.map(parseLevel);
 }

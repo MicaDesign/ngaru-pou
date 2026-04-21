@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Lock, Check } from "lucide-react";
 import type { Lesson } from "@/lib/airtable";
@@ -36,6 +38,22 @@ export default function LessonSidebar({
             const isDone = completedWeeks.includes(lesson.weekNumber);
             const isLocked = !lesson.isPublished;
 
+            const statusDot = isLocked ? (
+              <Lock size={14} className="shrink-0 text-white/30" />
+            ) : isDone ? (
+              <span
+                aria-label="Completed"
+                className="shrink-0 inline-flex h-4 w-4 items-center justify-center rounded-full bg-semantic-green"
+              >
+                <Check size={10} className="text-midnight-tidal" strokeWidth={3} />
+              </span>
+            ) : (
+              <span
+                aria-label="Not yet completed"
+                className="shrink-0 inline-block h-4 w-4 rounded-full border border-white/20"
+              />
+            );
+
             const content = (
               <div
                 className={`group flex items-center gap-3 rounded-lg px-3 py-5 transition-colors ${
@@ -49,18 +67,11 @@ export default function LessonSidebar({
                 <span className="font-sans text-base flex-1 truncate">
                   {lesson.title || "Untitled lesson"}
                 </span>
-                {isLocked ? (
-                  <Lock size={14} className="shrink-0 text-white/30" />
-                ) : isDone ? (
-                  <span className="shrink-0 inline-flex h-4 w-4 items-center justify-center rounded-full bg-semantic-green">
-                    <Check size={10} className="text-midnight-tidal" />
-                  </span>
-                ) : null}
+                {statusDot}
               </div>
             );
 
-            const separator =
-              idx > 0 ? "border-t border-white/10" : "";
+            const separator = idx > 0 ? "border-t border-white/10" : "";
 
             return (
               <li key={lesson.id} className={separator}>
