@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Globe, Mail } from "lucide-react";
 
 const footerColumns = [
@@ -15,12 +18,16 @@ const footerColumns = [
   ],
   [
     { label: "Code of Conduct", href: "/enrolment/code-of-conduct" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Legal", href: "/legal" },
+    { label: "Uniform Regulations", href: "/enrolment/uniform-regulations" },
+    { label: "Handy Hints", href: "/enrolment/handy-hints" },
+    { label: "Terms of Service", href: "/enrolment/terms-of-service" },
+    { label: "Legal & Privacy", href: "/enrolment/legal" },
   ],
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
+
   return (
     <footer className="border-t border-white/[0.11] bg-midnight-tidal pt-16 pb-8">
       <div className="site-container">
@@ -37,17 +44,25 @@ export default function Footer() {
             />
           </Link>
           {footerColumns.map((col, i) => (
-            <ul key={i} className="flex flex-col gap-1">
-              {col.map(({ label, href }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    className="font-sans text-white hover:text-primary text-[1.1rem] px-[10px] py-[5px] rounded-lg inline-block transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)]"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
+            <ul key={i} className="flex flex-col gap-1 items-start">
+              {col.map(({ label, href }) => {
+                const isActive = pathname === href;
+                return (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`font-sans text-[1.1rem] px-[10px] py-[5px] rounded-full inline-block transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${
+                        isActive
+                          ? "bg-primary text-white"
+                          : "text-white hover:text-primary"
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           ))}
         </div>

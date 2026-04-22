@@ -187,3 +187,10 @@ The exported Webflow site lives at:
 Use it for: colours, spacing, font sizes, images, layout structure, content copy.
 Do NOT use its HTML/CSS/JS directly.
 Assets (images, fonts) may be copied into public/ as needed.
+
+## Client Documents
+Source-of-truth PDFs from the client, in `docs/` at the project root. Read them with the Read tool when building content pages that need this material — do not invent or paraphrase policy content without consulting the relevant PDF.
+
+- `docs/CODE OF CONDUCT.pdf` — Code of conduct content (behavioural expectations, safety policies, reportable behaviours, enforcement).
+- `docs/NGARU POU CULTURAL ARTS INC. - HANDY HINTS.pdf` — Fees, attendance, wānanga, komiti, and complaints information.
+- `docs/NGARU POU CULTURAL ARTS INC. - UNIFORM REGULATIONS.pdf` — Performance wear guidelines for boys and girls, makeup bag, clothing regulations, poi and rakau rules.
