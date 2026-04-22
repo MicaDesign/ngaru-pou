@@ -14,12 +14,11 @@ export default function LegalPrivacyPage() {
       <p>
         <strong>Ngaru Pou Cultural Arts Inc.</strong> (the
         &quot;Society&quot;, &quot;we&quot;, &quot;us&quot;) is an
-        incorporated society registered in Aotearoa New Zealand. This
-        page sets out our privacy practices and general legal information
-        for members, whānau, and visitors to this website. It is written
-        to comply with the{" "}
-        <strong>New Zealand Privacy Act 2020</strong> and the thirteen
-        Information Privacy Principles (IPPs).
+        incorporated society. This page sets out our privacy practices
+        and general legal information for members, whānau, and visitors
+        to this website. It is written in line with applicable privacy
+        legislation and general best-practice principles for handling
+        personal information.
       </p>
 
       <h2>Who We Are</h2>
@@ -84,8 +83,8 @@ export default function LegalPrivacyPage() {
           students
         </li>
         <li>
-          Meet legal and reporting obligations, including those under the
-          Incorporated Societies Act 2022
+          Meet legal and reporting obligations under our constitution,
+          rules, and applicable law
         </li>
       </ul>
 
@@ -110,14 +109,15 @@ export default function LegalPrivacyPage() {
           is a risk to the life or health of a tamaiti or member.
         </li>
         <li>
-          <strong>Legal obligations</strong> — where required by New
-          Zealand law.
+          <strong>Legal obligations</strong> — where required by
+          applicable law.
         </li>
       </ul>
       <p>
-        Some of our service providers may store data outside New Zealand.
-        Where this occurs, we take reasonable steps to ensure comparable
-        protections are in place, in line with IPP 12.
+        Some of our service providers may store data outside the country
+        where it was collected. Where this occurs, we take reasonable
+        steps to ensure comparable protections are in place, in line with
+        applicable data protection laws.
       </p>
 
       <h2>Storage &amp; Security</h2>
@@ -136,18 +136,17 @@ export default function LegalPrivacyPage() {
         destroyed when no longer required.
       </p>
 
-      <h2>Your Rights Under the Privacy Act 2020</h2>
+      <h2>Your Rights</h2>
       <p>
-        You have the right to:
+        Subject to applicable privacy legislation, you have the right to:
       </p>
       <ul>
         <li>
           <strong>Access</strong> the personal information we hold about
-          you or your tamaiti (IPP 6)
+          you or your tamaiti
         </li>
         <li>
           <strong>Correct</strong> information you believe is inaccurate
-          (IPP 7)
         </li>
         <li>
           <strong>Withdraw consent</strong> for certain uses, such as
@@ -160,17 +159,9 @@ export default function LegalPrivacyPage() {
       </ul>
       <p>
         To exercise any of these rights, please contact our Privacy
-        Officer (see{" "}
-        <a href="#contact">Contact</a> below). If you are not satisfied
-        with our response, you may contact the{" "}
-        <a
-          href="https://www.privacy.org.nz"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Office of the Privacy Commissioner
-        </a>
-        .
+        Officer (see <a href="#contact">Contact</a> below). If you are
+        not satisfied with our response, you may raise the matter with
+        the privacy regulator in your jurisdiction.
       </p>
 
       <h2>Photography, Video &amp; Social Media</h2>
@@ -205,8 +196,9 @@ export default function LegalPrivacyPage() {
       <h2>Governing Law</h2>
       <p>
         These notices and any dispute relating to them are governed by
-        the laws of New Zealand. The Society operates under the
-        Incorporated Societies Act 2022 and the Privacy Act 2020.
+        the laws of the jurisdiction in which the Society operates. The
+        Society is bound by its constitution and rules, and by relevant
+        data protection and privacy legislation.
       </p>
 
       <h2>Changes to This Notice</h2>

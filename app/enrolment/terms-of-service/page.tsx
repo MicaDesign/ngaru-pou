@@ -15,10 +15,9 @@ export default function TermsOfServicePage() {
         These terms of service (&quot;Terms&quot;) govern membership and
         participation in programmes, wānanga, events and activities
         delivered by <strong>Ngaru Pou Cultural Arts Inc.</strong> (the
-        &quot;Society&quot;), an incorporated society registered in
-        Aotearoa New Zealand. By enrolling a tamaiti, registering as a
+        &quot;Society&quot;). By enrolling a tamaiti, registering as a
         member, or participating in any Society activity, you agree to
-        these Terms and to the Society&apos;s Constitution.
+        these Terms and to the Society&apos;s constitution and rules.
       </p>
 
       <h2>Membership</h2>
@@ -30,7 +29,7 @@ export default function TermsOfServicePage() {
         of the komiti and may be reviewed or revoked where a member
         breaches these Terms, the{" "}
         <Link href="/enrolment/code-of-conduct">Code of Conduct</Link>, or
-        the Society&apos;s Constitution.
+        the Society&apos;s constitution and rules.
       </p>
       <p>
         Parents and legal guardians remain responsible for the tamariki in
@@ -99,7 +98,8 @@ export default function TermsOfServicePage() {
         <Link href="/enrolment/code-of-conduct">Code of Conduct</Link> and{" "}
         <Link href="/enrolment/uniform-regulations">Uniform Regulations</Link>.
         Breaches may be addressed by the komiti under the Society&apos;s
-        Constitution, up to and including removal from the roopu.
+        constitution and rules, up to and including removal from the
+        roopu.
       </p>
 
       <h2>Cancellation, Withdrawal &amp; Refunds</h2>
@@ -146,10 +146,9 @@ export default function TermsOfServicePage() {
         law, Ngaru Pou Cultural Arts Inc., its komiti, tutors and
         volunteers are not liable for personal injury, illness, loss or
         damage to personal property arising from participation, other
-        than as required under the Accident Compensation Act 2001 or
-        other applicable New Zealand legislation. Nothing in these Terms
-        limits rights a consumer has under the Consumer Guarantees Act
-        1993 where that Act applies.
+        than as required under applicable law. Nothing in these Terms
+        limits any rights you may have under applicable consumer
+        protection legislation.
       </p>
       <p>
         Whānau are responsible for disclosing any medical conditions,
