@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import DocPageLayout from "@/components/DocPageLayout";
 import { getMemberstack } from "@/lib/memberstack";
@@ -154,6 +155,16 @@ export default function SelectPlanPage() {
         Continue to Payment
         <ArrowRight size={18} />
       </button>
+
+      {/* TODO: remove before going live */}
+      <div className="mt-4">
+        <Link
+          href="/enrolment/child-details"
+          className="font-sans text-xs !text-midnight-tidal/40 hover:!text-midnight-tidal/60 !no-underline transition-colors"
+        >
+          Skip Payment (Test Only)
+        </Link>
+      </div>
     </DocPageLayout>
   );
 }
