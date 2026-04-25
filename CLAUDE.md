@@ -5,6 +5,7 @@ A culturally grounded e-learning platform for Māori students. Built for a clien
 
 ## Live URLs
 - Production: https://ngaru-pou.vercel.app
+- Custom domain: https://www.ngarupou.org.au (Live Mode in MemberStack)
 - GitHub: https://github.com/MicaDesign/ngaru-pou
 
 ## Local Development
@@ -144,28 +145,70 @@ Also set all three in Vercel dashboard: Settings → Environment Variables (requ
 - Free Plan is auto-assigned on signup via plans: [{ planId: "pln_free-plan-gt6r0336" }]
 - Custom field keys use hyphenated format — MemberStack stores them as `first-name` and `last-name` (not `firstName`/`lastName`). Always read them via bracket access: `member?.customFields?.["first-name"]`. The signup page writes them with the hyphenated keys; every consumer must match.
 
+## MemberStack Configuration
+- Public key: pk_b262170f0a74caaa56d4
+- Plans:
+  - Free Plan
+  - Kaiako (Teacher) — free
+  - Parent Member — paid ($250 / $350 / $500 AUD/year for 1 / 2 / 3+ children)
+- Parent Member price IDs:
+  - prc_annual-fee-crsr030o — 1 child ($250/year)
+  - prc_two-children-03su03t9 — 2 children ($350/year)
+  - prc_three-or-more-children-wd1cs0e9h — 3+ children ($500/year)
+- Data Tables: `parent_profiles`, `student_profiles`, `kaiako_questions`, `lesson_progress`
+- Plan-based redirects:
+  - Free Plan → /onboarding
+  - Parent Member → /enrolment/child-details
+  - Kaiako → /onboarding/kaiako-request
+  - All plans → /dashboard on subsequent login
+
+## Enrolment Flow
+The parent enrolment journey, in order:
+1. /onboarding — Who are you? selector (Kaiako or Parent)
+2. /enrolment/welcome — intro and steps overview
+3. /enrolment/consent — 4 checkboxes (code of conduct, terms, participation, photo consent)
+4. /enrolment/parent-details — phone, address, suburb, state, postcode
+5. /enrolment/select-plan — choose 1/2/3 children, triggers MemberStack checkout
+6. /enrolment/child-details — first name, last name, DOB, level, username, PIN, medical notes per child
+7. /enrolment/complete — confirmation page
+
+## Student Login
+- Students do not have MemberStack accounts.
+- They log in via /student-login with username + PIN.
+- Their profiles are stored in the `student_profiles` Data Table, linked to their parent's MemberStack member ID.
+- Levels:
+  - Te Pūmanawa — 5–8 yrs
+  - Te Pūkenga Rau — 9–12 yrs
+  - Te Pūkenga — 13–19 yrs
+
+## Enrolment Policy Pages
+All use `DocPageLayout`, located under `/enrolment/`:
+- code-of-conduct
+- terms-of-service
+- legal
+- uniform-regulations
+- handy-hints
+
 ## Build Phases
-- ✅ Phase 0: Developer tools installed (Node, Git, VS Code, GitHub Desktop, Claude Code)
+- ✅ Phase 0: Developer tools installed
 - ✅ Phase 1: Blank Next.js site live on Vercel
 - ✅ Phase 2a: Design system + full homepage built and deployed
-- ✅ Phase 3: MemberStack auth complete
-  - Login page with full UX feedback (loading, success, specific errors)
-  - Signup page with password strength bar, real-time validation, confirmation screen
-  - Email verification flow with /verified page
-  - Client-side route protection on dashboard
-  - Free Plan auto-assigned on signup
-  - Nav shows different buttons when logged in vs logged out
-- ✅ Phase 4: Airtable integration — level and lesson pages live
-  - lib/airtable.ts with typed fetchers, batched record-ID queries, 5-min ISR caching
-  - Level overview page at /dashboard/levels/[slug] with lesson grid + locked states
-  - Lesson page at /dashboard/levels/[slug]/lessons/[week] — fixed left sidebar, teal rounded banner with Mark Complete pill button, video placeholder, objectives/key features/vocabulary/teacher notes, sticky right schedule sidebar, Ask the Kaiako form
-  - AuthGuard client wrapper protects both routes via existing MemberStack pattern
-  - Branded 404 page at /not-found with centred koru mark and diagonal SVG accents
-  - Publish gate (!lesson.isPublished → 404) temporarily bypassed during content fill-in; restore when Airtable "Is Published" is set
-- ✅ Phase 6: Progress tracking via MemberStack Data Tables (`lesson_progress`). Mark Complete writes `completed`/`completed_at`/`member_id`; LessonSidebar shows green dots for completed weeks; LessonView seeds records on mount via `ensureProgressRecord` (also backfills missing `member_id` on legacy rows).
-- ✅ Phase 7: Student dashboard at /dashboard. Two states — "Get started" hero + level mini-cards for members with no progress; teal "welcome back" banner + current-level lesson list with "Continue learning →" CTA and per-lesson completion dots for members with progress. Server fetches all levels + basic lessons; client fetches `getCompletedWeeksForLevel` per level.
-- ✅ Phase 8: Kaiako (teacher) dashboard at /dashboard/teacher (plan-gated). DashboardView auto-routes Kaiako members to the teacher view. Two sections side-by-side (50/50 grid): Students (registry + admin-API identity, per-student progress via `getProgressByMemberId` → per-level teal pill + Airtable thumbnail + link to `/dashboard/levels/[slug]`) and Ask the Kaiako inbox (read/answer `kaiako_questions`, updates flip records to `answered:true` with teacher reply). Students see replies on the matching lesson page via KaiakoReplies. `app/api/teacher/members` pulls the authoritative roster from the MemberStack Admin REST API with `X-API-KEY` auth.
-- 🔜 Phase 5: Vimeo video embeds on lesson pages (replace the placeholder, pull Vimeo URL + caption file from Airtable Videos table) — deferred, content not yet available
+- ✅ Phase 2b: Homepage styling refinement + animations
+- ✅ Phase 3a: Who are you? onboarding selector (Kaiako / Parent)
+- ✅ Phase 3b: Parent enrolment flow (welcome → consent → parent-details → select-plan → child-details → complete)
+- ✅ Phase 3c: Student login page (/student-login) with username + PIN
+- ✅ Phase 3d: MemberStack plans set up (Free, Kaiako Teacher, Parent Member with 3 price points)
+- ✅ Phase 3e: Stripe connected to MemberStack (live mode, test mode available via Dev Tools)
+- ✅ Phase 3f: MemberStack Data Tables set up (parent_profiles, student_profiles, kaiako_questions, lesson_progress)
+- ✅ Phase 3g: Child details form saves to student_profiles and parent_profiles via MemberStack Data Tables
+- 🔜 Phase 3h: Kaiako approval email flow
+- 🔜 Phase 4: Parent dashboard (view own children's profiles and progress)
+- 🔜 Phase 5: Kaiako dashboard (view all students)
+- 🔜 Phase 6: Concurrent session limiting (login sharing prevention)
+- 🔜 Phase 7: Airtable integration — pull curriculum (courses, modules, lessons)
+- 🔜 Phase 8: Vimeo video embeds on lesson pages
+- 🔜 Phase 9: Progress tracking
+- 🔜 Phase 10: Full student learning experience
 
 ## Coding Conventions
 - Always use named Tailwind colour tokens, never raw hex
