@@ -8,7 +8,8 @@ import AuthGuard from "@/components/AuthGuard";
 import { getMemberstack } from "@/lib/memberstack";
 
 type ChildForm = {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   dob: string;
   level: string;
   medical: string;
@@ -17,7 +18,8 @@ type ChildForm = {
 };
 
 const EMPTY_CHILD: ChildForm = {
-  fullName: "",
+  firstName: "",
+  lastName: "",
   dob: "",
   level: "",
   medical: "",
@@ -35,18 +37,6 @@ function planToCount(plan: string | null): number {
   if (plan === "2-children") return 2;
   if (plan === "3-plus-children") return 3;
   return 1;
-}
-
-function pickField(
-  cf: Record<string, unknown> | undefined,
-  ...keys: string[]
-): string {
-  if (!cf) return "";
-  for (const k of keys) {
-    const v = cf[k];
-    if (typeof v === "string" && v.trim()) return v.trim();
-  }
-  return "";
 }
 
 function extractErrorMessage(err: unknown): string {
@@ -95,6 +85,11 @@ type MemberShape = {
   customFields?: Record<string, unknown>;
 };
 
+function childDisplayName(c: ChildForm, fallback: string): string {
+  const combined = `${c.firstName} ${c.lastName}`.trim();
+  return combined || fallback;
+}
+
 export default function ChildDetailsPage() {
   return (
     <AuthGuard>
@@ -128,7 +123,8 @@ function ChildDetailsForm() {
     for (let i = 0; i < children.length; i++) {
       const c = children[i];
       if (
-        !c.fullName.trim() ||
+        !c.firstName.trim() ||
+        !c.lastName.trim() ||
         !c.dob ||
         !c.level ||
         !c.username.trim() ||
@@ -173,41 +169,18 @@ function ChildDetailsForm() {
         );
       }
 
-      const customFields = member.customFields;
-
-      try {
-        await safeApiCall("Creating parent profile", () =>
-          ms.createDataRecord({
-            table: "parent_profiles",
-            data: {
-              email: member.auth?.email ?? "",
-              first_name: pickField(customFields, "first-name", "firstName"),
-              last_name: pickField(customFields, "last-name", "lastName"),
-            },
-          }),
-        );
-      } catch (err) {
-        const msg = extractErrorMessage(err).toLowerCase();
-        const looksLikeDuplicate =
-          msg.includes("already exists") ||
-          msg.includes("duplicate") ||
-          msg.includes("unique") ||
-          msg.includes("conflict");
-        if (!looksLikeDuplicate) throw err;
-        console.log(
-          "Parent profile already exists for this member — continuing.",
-        );
-      }
+      const memberId = member.id;
 
       for (let idx = 0; idx < children.length; idx++) {
         const child = children[idx];
-        const childLabel = child.fullName.trim() || `Child ${idx + 1}`;
+        const childLabel = childDisplayName(child, `Child ${idx + 1}`);
         await safeApiCall(`Saving ${childLabel}`, () =>
           ms.createDataRecord({
             table: "student_profiles",
             data: {
-              first_name: child.fullName,
-              last_name: "",
+              parent_member_id: memberId,
+              first_name: child.firstName,
+              last_name: child.lastName,
               date_of_birth: child.dob,
               level: child.level,
               username: child.username,
@@ -249,7 +222,7 @@ function ChildDetailsForm() {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-wrap gap-2 mb-6" role="tablist">
           {children.map((child, i) => {
-            const label = child.fullName.trim() || `Child ${i + 1}`;
+            const label = childDisplayName(child, `Child ${i + 1}`);
             const isActive = i === activeIndex;
             return (
               <button
@@ -278,20 +251,37 @@ function ChildDetailsForm() {
               className="bg-white rounded-2xl p-6 md:p-8 border border-midnight-tidal/10 mb-6"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-midnight-tidal/70 mb-1.5">
-                    Full name
+                    First name
                   </label>
                   <input
                     type="text"
                     required
                     disabled={submitting}
-                    value={child.fullName}
+                    value={child.firstName}
                     onChange={(e) =>
-                      updateChild(i, { fullName: e.target.value })
+                      updateChild(i, { firstName: e.target.value })
                     }
                     className={inputClass}
-                    placeholder="First and last name"
+                    placeholder="First name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-midnight-tidal/70 mb-1.5">
+                    Last name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    disabled={submitting}
+                    value={child.lastName}
+                    onChange={(e) =>
+                      updateChild(i, { lastName: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Last name"
                   />
                 </div>
 

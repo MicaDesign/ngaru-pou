@@ -92,7 +92,7 @@ export default function ConsentPage() {
       </div>
 
       <Link
-        href={allChecked ? "/enrolment/select-plan" : "#"}
+        href={allChecked ? "/enrolment/parent-details" : "#"}
         aria-disabled={!allChecked}
         onClick={(e) => {
           if (!allChecked) e.preventDefault();

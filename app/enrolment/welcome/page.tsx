@@ -24,9 +24,12 @@ export default function WelcomePage() {
       <h2>What to expect</h2>
       <ol>
         <li>
-          <strong>
-            Review and agree to our Code of Conduct and Terms of Service.
-          </strong>
+          <strong>Review and agree to our policies</strong> — Code of
+          Conduct and Terms of Service.
+        </li>
+        <li>
+          <strong>Enter your contact details</strong> so the komiti can
+          reach you.
         </li>
         <li>
           <strong>Select your membership plan</strong> based on the number
