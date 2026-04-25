@@ -95,10 +95,6 @@ type MemberShape = {
   customFields?: Record<string, unknown>;
 };
 
-type RecordsResponse = {
-  data?: { records?: unknown[] };
-};
-
 export default function ChildDetailsPage() {
   return (
     <AuthGuard>
@@ -177,23 +173,9 @@ function ChildDetailsForm() {
         );
       }
 
-      const memberId = member.id;
       const customFields = member.customFields;
 
-      const parentLookup = (await safeApiCall(
-        "Looking up parent profile",
-        () =>
-          ms.queryDataRecords({
-            table: "parent_profiles",
-            query: {
-              where: { memberId: { equals: memberId } },
-              take: 1,
-            },
-          }),
-      )) as RecordsResponse;
-      const parentRecords = parentLookup.data?.records ?? [];
-      const hasParentRow = parentRecords.length > 0;
-      if (!hasParentRow) {
+      try {
         await safeApiCall("Creating parent profile", () =>
           ms.createDataRecord({
             table: "parent_profiles",
@@ -203,6 +185,17 @@ function ChildDetailsForm() {
               last_name: pickField(customFields, "last-name", "lastName"),
             },
           }),
+        );
+      } catch (err) {
+        const msg = extractErrorMessage(err).toLowerCase();
+        const looksLikeDuplicate =
+          msg.includes("already exists") ||
+          msg.includes("duplicate") ||
+          msg.includes("unique") ||
+          msg.includes("conflict");
+        if (!looksLikeDuplicate) throw err;
+        console.log(
+          "Parent profile already exists for this member — continuing.",
         );
       }
 
