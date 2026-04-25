@@ -9,6 +9,7 @@ const AUTH_ROUTES = [
   "/signup",
   "/verified",
   "/student-login",
+  "/student-dashboard",
   "/onboarding",
   "/onboarding/kaiako-request",
 ];

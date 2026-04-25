@@ -64,6 +64,35 @@ export function ageInYears(dob: string): number | null {
   return age >= 0 ? age : null;
 }
 
+export async function findStudentByUsernameAndPin(
+  username: string,
+  pin: string,
+): Promise<ChildProfile | null> {
+  const ms = getMemberstack();
+  if (!ms || !username || !pin) return null;
+
+  try {
+    const { data } = await ms.queryDataRecords({
+      table: TABLE,
+      query: {
+        where: {
+          AND: [
+            { username: { equals: username } },
+            { pin: { equals: pin } },
+          ],
+        },
+        take: 1,
+      },
+    });
+    if ("records" in data && data.records.length > 0) {
+      return parseChild(data.records[0] as RawRecord);
+    }
+  } catch (err) {
+    console.error("findStudentByUsernameAndPin failed", err);
+  }
+  return null;
+}
+
 export async function getChildrenForParent(
   parentMemberId: string,
 ): Promise<ChildProfile[]> {

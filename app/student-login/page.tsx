@@ -3,25 +3,64 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { findStudentByUsernameAndPin } from "@/lib/studentProfiles";
+import { setStudentSession } from "@/lib/studentSession";
 
 export default function StudentLoginPage() {
   const [username, setUsername] = useState("");
   const [pin, setPin] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("Student login attempt:", { username, pin });
+    if (submitting) return;
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      const student = await findStudentByUsernameAndPin(
+        username.trim(),
+        pin.trim(),
+      );
+
+      if (!student) {
+        setError("Username or PIN is incorrect. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      setStudentSession({
+        id: student.id,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        level: student.level,
+        username: student.username,
+        parentMemberId: student.parentMemberId,
+      });
+
+      window.location.href = "/student-dashboard";
+    } catch (err) {
+      console.error("student-login failed", err);
+      setError(
+        "Something went wrong signing you in. Please try again in a moment.",
+      );
+      setSubmitting(false);
+    }
   }
 
   const inputBase =
-    "w-full bg-white/10 border border-white/15 rounded-2xl px-5 py-4 text-white text-lg placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all";
+    "w-full bg-white/10 border border-white/15 rounded-2xl px-5 py-4 text-white text-lg placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
 
   return (
     <div className="min-h-screen bg-iron-depth flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <Link href="/" className="inline-block transition-transform duration-200 hover:scale-105">
+          <Link
+            href="/"
+            className="inline-block transition-transform duration-200 hover:scale-105"
+          >
             <Image
               src="/images/main-logo-white.svg"
               alt="Ngaru Pou"
@@ -49,6 +88,7 @@ export default function StudentLoginPage() {
                 type="text"
                 required
                 autoComplete="username"
+                disabled={submitting}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="your username"
@@ -67,6 +107,7 @@ export default function StudentLoginPage() {
                 maxLength={4}
                 required
                 autoComplete="off"
+                disabled={submitting}
                 value={pin}
                 onChange={(e) =>
                   setPin(e.target.value.replace(/\D/g, "").slice(0, 4))
@@ -76,12 +117,34 @@ export default function StudentLoginPage() {
               />
             </div>
 
+            {error && (
+              <div className="flex items-start gap-2 rounded-2xl bg-semantic-red/10 border border-semantic-red/25 px-4 py-3">
+                <AlertCircle
+                  size={16}
+                  className="text-semantic-red mt-0.5 shrink-0"
+                />
+                <span className="block text-semantic-red text-sm leading-snug">
+                  {error}
+                </span>
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl bg-secondary hover:bg-lagoon-drift text-midnight-tidal font-bold text-lg transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:-translate-y-0.5 mt-2"
+              disabled={submitting}
+              className="w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl bg-secondary hover:bg-lagoon-drift text-midnight-tidal font-bold text-lg transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:-translate-y-0.5 mt-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
-              Sign In
-              <ArrowRight size={18} />
+              {submitting ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Signing in…
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight size={18} />
+                </>
+              )}
             </button>
           </form>
         </div>
