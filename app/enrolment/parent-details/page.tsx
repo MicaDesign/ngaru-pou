@@ -6,6 +6,7 @@ import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import DocPageLayout from "@/components/DocPageLayout";
 import AuthGuard from "@/components/AuthGuard";
 import { getMemberstack } from "@/lib/memberstack";
+import { upsertParentProfile } from "@/lib/parentProfile";
 
 const STATES = [
   { value: "WA", label: "Western Australia" },
@@ -20,21 +21,7 @@ const STATES = [
 
 type MemberShape = {
   id?: string;
-  auth?: { email?: string };
-  customFields?: Record<string, unknown>;
 };
-
-function pickField(
-  cf: Record<string, unknown> | undefined,
-  ...keys: string[]
-): string {
-  if (!cf) return "";
-  for (const k of keys) {
-    const v = cf[k];
-    if (typeof v === "string" && v.trim()) return v.trim();
-  }
-  return "";
-}
 
 function extractErrorMessage(err: unknown): string {
   if (!err) return "Unknown error";
@@ -118,37 +105,15 @@ function ParentDetailsForm() {
         );
       }
 
-      const customFields = member.customFields;
-
-      try {
-        await safeApiCall("Saving your details", () =>
-          ms.createDataRecord({
-            table: "parent_profiles",
-            data: {
-              member_id: member.id,
-              email: member.auth?.email ?? "",
-              first_name: pickField(customFields, "first-name", "firstName"),
-              last_name: pickField(customFields, "last-name", "lastName"),
-              phone,
-              street,
-              suburb,
-              state,
-              postcode,
-            },
-          }),
-        );
-      } catch (err) {
-        const msg = extractErrorMessage(err).toLowerCase();
-        const looksLikeDuplicate =
-          msg.includes("already exists") ||
-          msg.includes("duplicate") ||
-          msg.includes("unique") ||
-          msg.includes("conflict");
-        if (!looksLikeDuplicate) throw err;
-        console.log(
-          "Parent profile already exists for this member — continuing.",
-        );
-      }
+      await safeApiCall("Saving your details", () =>
+        upsertParentProfile(member.id!, {
+          phone,
+          street,
+          suburb,
+          state,
+          postcode,
+        }),
+      );
 
       router.push("/enrolment/select-plan");
     } catch (err) {

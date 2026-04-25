@@ -7,8 +7,10 @@ import { Loader2, ArrowRight, Check } from "lucide-react";
 import { getMemberstack } from "@/lib/memberstack";
 import { getCompletedWeeksForLevel } from "@/lib/progress";
 import { isKaiako } from "@/lib/kaiako";
+import { isParent } from "@/lib/parent";
 import { ensureStudentRegistered } from "@/lib/studentRegistry";
 import TeacherDashboardView from "./TeacherDashboardView";
+import ParentDashboardView from "./ParentDashboardView";
 import type { Level, LessonBasic } from "@/lib/airtable";
 
 type Props = {
@@ -19,7 +21,11 @@ type Props = {
 type Member = {
   auth?: { email?: string };
   customFields?: Record<string, unknown>;
-  planConnections?: { planId?: string; active?: boolean }[];
+  planConnections?: {
+    planId?: string;
+    active?: boolean;
+    payment?: { priceId?: string } | null;
+  }[];
 } | null;
 
 const PLACEHOLDER_IMAGES = [
@@ -67,11 +73,27 @@ export default function DashboardView({ levels, lessonsByLevel }: Props) {
           return;
         }
         if (cancelled) return;
+
+        // TEMP DEBUG — remove once parent dashboard routing is confirmed.
+        console.log("[NgaruPou debug] FULL member object:", data);
+        console.log(
+          "[NgaruPou debug] FULL member (JSON):",
+          JSON.stringify(data, null, 2),
+        );
+        console.log("[NgaruPou debug] member keys:", Object.keys(data ?? {}));
+        console.log("[NgaruPou debug] member.id:", data.id);
+        console.log(
+          "[NgaruPou debug] data.planConnections:",
+          data.planConnections,
+        );
+        console.log("[NgaruPou debug] isKaiako:", isKaiako(data));
+        console.log("[NgaruPou debug] isParent:", isParent(data));
+
         setMember(data);
         setPlanChecked(true);
 
-        if (isKaiako(data)) {
-          // TeacherDashboardView handles its own data loading — stop here.
+        if (isKaiako(data) || isParent(data)) {
+          // Teacher and Parent views handle their own data loading.
           return;
         }
 
@@ -103,6 +125,10 @@ export default function DashboardView({ levels, lessonsByLevel }: Props) {
 
   if (planChecked && isKaiako(member)) {
     return <TeacherDashboardView levels={levels} />;
+  }
+
+  if (planChecked && isParent(member)) {
+    return <ParentDashboardView levels={levels} />;
   }
 
   if (loading) {

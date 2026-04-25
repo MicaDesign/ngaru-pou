@@ -6,6 +6,7 @@ import { ArrowRight, Check } from "lucide-react";
 import DocPageLayout from "@/components/DocPageLayout";
 import AuthGuard from "@/components/AuthGuard";
 import { getMemberstack } from "@/lib/memberstack";
+import { upsertParentProfile } from "@/lib/parentProfile";
 
 declare global {
   interface Window {
@@ -75,7 +76,20 @@ export default function SelectPlanPage() {
     if (!selected) return;
     const plan = PLANS.find((p) => p.id === selected);
     if (!plan) return;
-    getMemberstack();
+    const ms = getMemberstack();
+
+    try {
+      const { data: member } = await ms.getCurrentMember();
+      if (member?.id) {
+        await upsertParentProfile(member.id, {
+          enrolment_plan: plan.id,
+          price_id: plan.priceId,
+        });
+      }
+    } catch (err) {
+      console.error("Saving enrolment_plan to parent_profiles failed", err);
+    }
+
     if (!window.$memberstackDom?.purchasePlansWithCheckout) return;
     await window.$memberstackDom.purchasePlansWithCheckout({
       priceId: plan.priceId,
