@@ -186,7 +186,7 @@ function ChildDetailsForm() {
           ms.queryDataRecords({
             table: "parent_profiles",
             query: {
-              where: { parent_member_id: { equals: memberId } },
+              where: { memberId: { equals: memberId } },
               take: 1,
             },
           }),
@@ -198,7 +198,6 @@ function ChildDetailsForm() {
           ms.createDataRecord({
             table: "parent_profiles",
             data: {
-              parent_member_id: memberId,
               email: member.auth?.email ?? "",
               first_name: pickField(customFields, "first-name", "firstName"),
               last_name: pickField(customFields, "last-name", "lastName"),
@@ -214,7 +213,6 @@ function ChildDetailsForm() {
           ms.createDataRecord({
             table: "student_profiles",
             data: {
-              parent_member_id: memberId,
               first_name: child.fullName,
               last_name: "",
               date_of_birth: child.dob,
