@@ -97,7 +97,7 @@ export default function SelectPlanPage() {
               type="button"
               onClick={() => handleSelect(plan.id)}
               aria-pressed={isSelected}
-              className={`text-left rounded-2xl p-6 border-2 transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${
+              className={`text-left rounded-2xl p-6 border-2 transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:scale-105 ${
                 isSelected
                   ? "border-primary bg-white shadow-[0_12px_30px_rgba(44,163,187,0.18)]"
                   : "border-midnight-tidal/10 bg-white hover:border-primary/40"

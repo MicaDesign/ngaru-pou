@@ -30,7 +30,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex h-14 cursor-pointer items-center gap-3 rounded-lg px-6 font-sans text-base font-medium transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:-translate-y-0.5 ${variantClasses[variant]} ${className}`}
+      className={`inline-flex h-14 cursor-pointer items-center gap-3 rounded-lg px-6 font-sans text-base font-medium transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:-translate-y-0.5 hover:scale-105 ${variantClasses[variant]} ${className}`}
       {...props}
     >
       {Icon && iconPosition === "left" && <Icon size={18} />}

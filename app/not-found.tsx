@@ -6,14 +6,20 @@ export default function NotFound() {
   return (
     <div className="relative min-h-[calc(100vh-6rem)] overflow-hidden bg-midnight-tidal flex items-center justify-center px-6">
       <div className="relative z-10 flex flex-col items-center text-center max-w-xl">
-        <Image
-          src="/images/logo-icon-4.svg"
-          alt="Ngaru Pou"
-          width={72}
-          height={72}
-          className="h-16 w-16 mb-10 opacity-80"
-          priority
-        />
+        <Link
+          href="/"
+          className="mb-10 inline-block opacity-80 transition-transform duration-200 hover:scale-105 hover:opacity-100"
+          aria-label="Ngaru Pou — back to homepage"
+        >
+          <Image
+            src="/images/logo-icon-4.svg"
+            alt="Ngaru Pou"
+            width={72}
+            height={72}
+            className="h-16 w-16"
+            priority
+          />
+        </Link>
 
         <p className="font-sans text-xs uppercase tracking-[0.3em] text-primary mb-4">
           404

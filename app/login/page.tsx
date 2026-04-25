@@ -116,7 +116,9 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-midnight-tidal border border-white/10 rounded-2xl p-8 md:p-10 shadow-xl">
 
         <div className="flex justify-center mb-8">
-          <Image src="/images/main-logo-white.svg" alt="Ngaru Pou" width={200} height={44} priority />
+          <Link href="/" className="inline-block transition-transform duration-200 hover:scale-105">
+            <Image src="/images/main-logo-white.svg" alt="Ngaru Pou" width={200} height={44} priority />
+          </Link>
         </div>
 
         <h1 className="font-display text-4xl text-white mb-2">welcome back</h1>

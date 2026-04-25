@@ -21,13 +21,15 @@ export default function StudentLoginPage() {
     <div className="min-h-screen bg-iron-depth flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <Image
-            src="/images/main-logo-white.svg"
-            alt="Ngaru Pou"
-            width={200}
-            height={44}
-            priority
-          />
+          <Link href="/" className="inline-block transition-transform duration-200 hover:scale-105">
+            <Image
+              src="/images/main-logo-white.svg"
+              alt="Ngaru Pou"
+              width={200}
+              height={44}
+              priority
+            />
+          </Link>
         </div>
 
         <div className="bg-midnight-tidal border border-secondary/30 rounded-3xl p-8 md:p-10 shadow-xl">

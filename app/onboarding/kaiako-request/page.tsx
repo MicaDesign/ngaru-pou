@@ -47,13 +47,15 @@ function KaiakoRequestForm() {
     <div className="min-h-screen bg-iron-depth flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-xl bg-midnight-tidal border border-white/10 rounded-2xl p-8 md:p-10 shadow-xl">
         <div className="flex justify-center mb-8">
-          <Image
-            src="/images/main-logo-white.svg"
-            alt="Ngaru Pou"
-            width={180}
-            height={40}
-            priority
-          />
+          <Link href="/" className="inline-block transition-transform duration-200 hover:scale-105">
+            <Image
+              src="/images/main-logo-white.svg"
+              alt="Ngaru Pou"
+              width={180}
+              height={40}
+              priority
+            />
+          </Link>
         </div>
 
         {submitted ? (
