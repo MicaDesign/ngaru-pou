@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import DocPageLayout from "@/components/DocPageLayout";
+import AuthGuard from "@/components/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Enrolment Complete | Ngaru Pou Cultural Arts",
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 
 export default function EnrolmentCompletePage() {
   return (
-    <DocPageLayout title="Nau mai, haere mai!">
+    <AuthGuard>
+      <DocPageLayout title="Nau mai, haere mai!">
       <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-semantic-green/15 text-semantic-green mb-6">
         <CheckCircle size={32} />
       </div>
@@ -56,6 +58,7 @@ export default function EnrolmentCompletePage() {
           <ArrowRight size={18} />
         </Link>
       </div>
-    </DocPageLayout>
+      </DocPageLayout>
+    </AuthGuard>
   );
 }

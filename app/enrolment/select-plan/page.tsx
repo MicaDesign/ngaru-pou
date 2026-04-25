@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import DocPageLayout from "@/components/DocPageLayout";
+import AuthGuard from "@/components/AuthGuard";
 import { getMemberstack } from "@/lib/memberstack";
 
 declare global {
@@ -82,7 +83,8 @@ export default function SelectPlanPage() {
   }
 
   return (
-    <DocPageLayout title="Select Your Plan">
+    <AuthGuard>
+      <DocPageLayout title="Select Your Plan">
       <p>
         Choose the plan that matches the number of children you&apos;re
         enrolling. You can update this later by contacting the komiti.
@@ -165,6 +167,7 @@ export default function SelectPlanPage() {
           Skip Payment (Test Only)
         </Link>
       </div>
-    </DocPageLayout>
+      </DocPageLayout>
+    </AuthGuard>
   );
 }

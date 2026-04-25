@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import DocPageLayout from "@/components/DocPageLayout";
+import AuthGuard from "@/components/AuthGuard";
 
 function CheckboxRow({
   id,
@@ -42,7 +43,8 @@ export default function ConsentPage() {
   const allChecked = conduct && terms && participation && media;
 
   return (
-    <DocPageLayout title="Consent & Agreements">
+    <AuthGuard>
+      <DocPageLayout title="Consent & Agreements">
       <p>
         Please read and agree to the following before continuing your
         enrolment.
@@ -104,6 +106,7 @@ export default function ConsentPage() {
         Continue
         <ArrowRight size={18} />
       </Link>
-    </DocPageLayout>
+      </DocPageLayout>
+    </AuthGuard>
   );
 }

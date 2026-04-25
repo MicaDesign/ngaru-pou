@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import DocPageLayout from "@/components/DocPageLayout";
+import AuthGuard from "@/components/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Welcome | Ngaru Pou Cultural Arts",
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 
 export default function WelcomePage() {
   return (
-    <DocPageLayout title="Welcome, e te mātua">
+    <AuthGuard>
+      <DocPageLayout title="Welcome, e te mātua">
       <p>
         Nau mai, haere mai. We&apos;re so glad you&apos;re thinking about
         joining the Ngaru Pou whānau. This enrolment takes about{" "}
@@ -62,6 +64,7 @@ export default function WelcomePage() {
           <ArrowRight size={18} />
         </Link>
       </div>
-    </DocPageLayout>
+      </DocPageLayout>
+    </AuthGuard>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import DocPageLayout from "@/components/DocPageLayout";
+import AuthGuard from "@/components/AuthGuard";
 import { getMemberstack } from "@/lib/memberstack";
 
 type ChildForm = {
@@ -48,7 +49,65 @@ function pickField(
   return "";
 }
 
+function extractErrorMessage(err: unknown): string {
+  if (!err) return "Unknown error";
+  if (err instanceof Error) return err.message;
+  if (typeof err === "string") return err;
+  if (typeof err === "object") {
+    const e = err as Record<string, unknown>;
+    const nested = (e.error ?? e.data ?? e.body) as
+      | Record<string, unknown>
+      | undefined;
+    const candidates: unknown[] = [
+      e.message,
+      nested?.message,
+      e.code,
+      nested?.code,
+      e.type,
+    ];
+    for (const c of candidates) {
+      if (typeof c === "string" && c.trim()) return c;
+    }
+    try {
+      return JSON.stringify(err);
+    } catch {
+      return String(err);
+    }
+  }
+  return String(err);
+}
+
+async function safeApiCall(
+  label: string,
+  fn: () => Promise<unknown>,
+): Promise<unknown> {
+  try {
+    return await fn();
+  } catch (err) {
+    console.error(`API call failed — ${label}:`, err);
+    throw new Error(`${label}: ${extractErrorMessage(err)}`);
+  }
+}
+
+type MemberShape = {
+  id?: string;
+  auth?: { email?: string };
+  customFields?: Record<string, unknown>;
+};
+
+type RecordsResponse = {
+  data?: { records?: unknown[] };
+};
+
 export default function ChildDetailsPage() {
+  return (
+    <AuthGuard>
+      <ChildDetailsForm />
+    </AuthGuard>
+  );
+}
+
+function ChildDetailsForm() {
   const router = useRouter();
   const [count, setCount] = useState<number | null>(null);
   const [children, setChildren] = useState<ChildForm[]>([]);
@@ -65,7 +124,7 @@ export default function ChildDetailsPage() {
 
   function updateChild(i: number, patch: Partial<ChildForm>) {
     setChildren((prev) =>
-      prev.map((c, idx) => (idx === i ? { ...c, ...patch } : c))
+      prev.map((c, idx) => (idx === i ? { ...c, ...patch } : c)),
     );
   }
 
@@ -93,7 +152,7 @@ export default function ChildDetailsPage() {
     if (invalidIdx >= 0) {
       setActiveIndex(invalidIdx);
       setError(
-        `Please complete all required fields for Child ${invalidIdx + 1}.`
+        `Please complete all required fields for Child ${invalidIdx + 1}.`,
       );
       return;
     }
@@ -103,68 +162,76 @@ export default function ChildDetailsPage() {
       const ms = getMemberstack();
       if (!ms) {
         throw new Error(
-          "Sign-in service is not available. Please refresh and try again."
+          "Sign-in service is not available. Please refresh and try again.",
         );
       }
 
-      const { data: member } = await ms.getCurrentMember();
+      const memberResult = (await safeApiCall(
+        "Loading current member",
+        () => ms.getCurrentMember(),
+      )) as { data?: MemberShape };
+      const member = memberResult.data;
       if (!member?.id) {
         throw new Error(
-          "You need to be logged in to complete enrolment. Please log in and try again."
+          "You need to be logged in to complete enrolment. Please log in and try again.",
         );
       }
 
-      const memberId = member.id as string;
-      const customFields = member.customFields as
-        | Record<string, unknown>
-        | undefined;
+      const memberId = member.id;
+      const customFields = member.customFields;
 
-      const { data: parentLookup } = await ms.queryDataRecords({
-        table: "parent_profiles",
-        query: {
-          where: { parent_member_id: { equals: memberId } },
-          take: 1,
-        },
-      });
-      const hasParentRow =
-        "records" in parentLookup && parentLookup.records.length > 0;
+      const parentLookup = (await safeApiCall(
+        "Looking up parent profile",
+        () =>
+          ms.queryDataRecords({
+            table: "parent_profiles",
+            query: {
+              where: { parent_member_id: { equals: memberId } },
+              take: 1,
+            },
+          }),
+      )) as RecordsResponse;
+      const parentRecords = parentLookup.data?.records ?? [];
+      const hasParentRow = parentRecords.length > 0;
       if (!hasParentRow) {
-        await ms.createDataRecord({
-          table: "parent_profiles",
-          data: {
-            parent_member_id: memberId,
-            email: member.auth?.email ?? "",
-            first_name: pickField(customFields, "first-name", "firstName"),
-            last_name: pickField(customFields, "last-name", "lastName"),
-          },
-        });
+        await safeApiCall("Creating parent profile", () =>
+          ms.createDataRecord({
+            table: "parent_profiles",
+            data: {
+              parent_member_id: memberId,
+              email: member.auth?.email ?? "",
+              first_name: pickField(customFields, "first-name", "firstName"),
+              last_name: pickField(customFields, "last-name", "lastName"),
+            },
+          }),
+        );
       }
 
-      for (const child of children) {
-        await ms.createDataRecord({
-          table: "student_profiles",
-          data: {
-            parent_member_id: memberId,
-            first_name: child.fullName,
-            last_name: "",
-            date_of_birth: child.dob,
-            level: child.level,
-            username: child.username,
-            pin: child.pin,
-            medical_notes: child.medical,
-          },
-        });
+      for (let idx = 0; idx < children.length; idx++) {
+        const child = children[idx];
+        const childLabel = child.fullName.trim() || `Child ${idx + 1}`;
+        await safeApiCall(`Saving ${childLabel}`, () =>
+          ms.createDataRecord({
+            table: "student_profiles",
+            data: {
+              parent_member_id: memberId,
+              first_name: child.fullName,
+              last_name: "",
+              date_of_birth: child.dob,
+              level: child.level,
+              username: child.username,
+              pin: child.pin,
+              medical_notes: child.medical,
+            },
+          }),
+        );
       }
 
       localStorage.removeItem("np_enrolment_plan");
       router.push("/enrolment/complete");
     } catch (err) {
       console.error("child-details submit failed", err);
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Something went wrong saving your child profiles. Please try again.";
-      setError(message);
+      setError(extractErrorMessage(err));
       setSubmitting(false);
     }
   }
@@ -348,7 +415,7 @@ export default function ChildDetailsPage() {
               size={16}
               className="text-semantic-red mt-0.5 shrink-0"
             />
-            <span className="block text-semantic-red text-sm leading-snug">
+            <span className="block text-semantic-red text-sm leading-snug break-words">
               {error}
             </span>
           </div>
