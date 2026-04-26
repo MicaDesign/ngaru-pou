@@ -174,7 +174,8 @@ function ChildDetailsForm() {
       for (let idx = 0; idx < children.length; idx++) {
         const child = children[idx];
         const childLabel = childDisplayName(child, `Child ${idx + 1}`);
-        await safeApiCall(`Saving ${childLabel}`, () =>
+
+        const created = (await safeApiCall(`Saving ${childLabel}`, () =>
           ms.createDataRecord({
             table: "student_profiles",
             data: {
@@ -188,7 +189,55 @@ function ChildDetailsForm() {
               medical_notes: child.medical,
             },
           }),
-        );
+        )) as { data?: { id?: string } } | undefined;
+
+        const studentId = created?.data?.id ?? "";
+        if (!studentId) {
+          throw new Error(
+            `Could not record ${childLabel}'s profile id. Please try again.`,
+          );
+        }
+
+        const credRes = await fetch("/api/student-credentials", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-member-id": memberId,
+          },
+          body: JSON.stringify({
+            username: child.username,
+            pin: child.pin,
+            student: {
+              id: studentId,
+              parent_member_id: memberId,
+              first_name: child.firstName,
+              last_name: child.lastName,
+              level: child.level,
+            },
+          }),
+        });
+
+        if (!credRes.ok) {
+          // Roll back the just-created profile so a duplicate username
+          // doesn't leave an orphan row.
+          try {
+            await ms.deleteDataRecord({ recordId: studentId });
+          } catch (rollbackErr) {
+            console.error(
+              `child-details: rollback delete failed for ${childLabel}`,
+              rollbackErr,
+            );
+          }
+
+          const credBody = (await credRes
+            .json()
+            .catch(() => null)) as { error?: string } | null;
+          setActiveIndex(idx);
+          throw new Error(
+            credBody?.error ??
+              `Could not save login credentials for ${childLabel}. Please try a different username.`,
+          );
+        }
       }
 
       localStorage.removeItem("np_enrolment_plan");

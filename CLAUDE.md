@@ -104,9 +104,10 @@ A culturally grounded e-learning platform for Māori students. Built for a clien
 Required in .env.local (never commit this file):
 - NEXT_PUBLIC_MEMBERSTACK_KEY=pk_b262170f0a74caaa56d4
 - AIRTABLE_TOKEN=<personal access token> — server-side only, no NEXT_PUBLIC prefix (used by lib/airtable.ts in server components)
-- MEMBERSTACK_SECRET_KEY=<secret key from MemberStack Dev Tools> — server-side only, used by `app/api/teacher/members/route.ts` to call the Admin REST API with `X-API-KEY` auth
+- MEMBERSTACK_SECRET_KEY=<secret key from MemberStack Dev Tools> — server-side only, used by `app/api/teacher/members/route.ts` and `app/api/student-credentials/route.ts` to call the Admin REST API with `X-API-KEY` auth
+- KV_REST_API_URL + KV_REST_API_TOKEN — Vercel KV (Upstash Redis) credentials. Used by `lib/studentCredentials.ts` to store hashed student PINs. Pull locally with `vercel env pull` after provisioning the KV/Redis store in the Vercel dashboard
 
-Also set all three in Vercel dashboard: Settings → Environment Variables (required for the level pages, lesson pages, and teacher roster to work in production)
+Also set all of the above in Vercel dashboard: Settings → Environment Variables (required for the level pages, lesson pages, teacher roster, and student login to work in production)
 
 ## Services & Credentials
 - MemberStack: app.memberstack.com
@@ -175,7 +176,11 @@ The parent enrolment journey, in order:
 ## Student Login
 - Students do not have MemberStack accounts.
 - They log in via /student-login with username + PIN.
-- Their profiles are stored in the `student_profiles` Data Table, linked to their parent's MemberStack member ID.
+- Their **profiles** (display info) are stored in the MemberStack `student_profiles` Data Table, linked to their parent's MemberStack member ID.
+- Their **credentials** (username + bcrypt-hashed PIN) are stored in **Vercel KV** under key `student:<lowercase-username>` with shape `{ id, parent_member_id, first_name, last_name, level, username, pin_hash }`. Why split: MemberStack Data Tables can't be queried server-side without an authenticated member context (Admin REST API has no `/v1/data-records/query` endpoint; client.memberstack.com 403s for unauthenticated public-key calls), so a public-PIN-store would have been required to validate logins via the SDK. KV is server-only and PINs are bcrypt-hashed before write.
+- Login flow: `POST /api/student-login` (username, pin) → `lib/studentCredentials.readCredentials(username)` → `bcrypt.compare(pin, pin_hash)` → on match, sets the `np_student_session` httpOnly cookie and returns the student. Session is read by `app/student-dashboard/page.tsx` (server component) via `readStudentSessionFromCookies()`.
+- Credentials are written by `POST /api/student-credentials` from the parent's `child-details` flow. The route requires `x-member-id` header (parent's MemberStack id), verifies the parent against the Admin API, NX-writes the KV entry, returns 409 on duplicate username (which child-details surfaces as "username already taken" and rolls back the just-created `student_profiles` row).
+- **Backfill required**: any `student_profiles` rows that existed before this KV-based auth landed have NO corresponding KV credential entry — those students cannot log in. Either (a) ask the parent to re-run `/enrolment/child-details` with a fresh username/PIN (will fail collision check on the existing username, so they need a different one or an admin needs to delete the orphan student_profiles row first), or (b) write a one-off Node script that lists `student_profiles` rows via the DOM SDK in a Kaiako session and POSTs each to `/api/student-credentials` with a generated PIN (then communicate the PINs to parents).
 - Levels:
   - Te Pūmanawa — 5–8 yrs
   - Te Pūkenga Rau — 9–12 yrs

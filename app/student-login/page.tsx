@@ -4,8 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
-import { findStudentByUsernameAndPin } from "@/lib/studentProfiles";
-import { setStudentSession } from "@/lib/studentSession";
+
+type LoginResponse = {
+  success: boolean;
+  error?: string;
+};
 
 export default function StudentLoginPage() {
   const [username, setUsername] = useState("");
@@ -20,29 +23,27 @@ export default function StudentLoginPage() {
     setSubmitting(true);
 
     try {
-      const student = await findStudentByUsernameAndPin(
-        username.trim(),
-        pin.trim(),
-      );
+      const res = await fetch("/api/student-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username.trim(), pin: pin.trim() }),
+      });
 
-      if (!student) {
-        setError("Username or PIN is incorrect. Please try again.");
-        setSubmitting(false);
+      const payload = (await res.json().catch(() => null)) as
+        | LoginResponse
+        | null;
+
+      if (res.ok && payload?.success) {
+        window.location.href = "/student-dashboard";
         return;
       }
 
-      setStudentSession({
-        id: student.id,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        level: student.level,
-        username: student.username,
-        parentMemberId: student.parentMemberId,
-      });
-
-      window.location.href = "/student-dashboard";
+      setError(
+        payload?.error ?? "Username or PIN is incorrect. Please try again.",
+      );
+      setSubmitting(false);
     } catch (err) {
-      console.error("student-login failed", err);
+      console.error("student-login fetch failed", err);
       setError(
         "Something went wrong signing you in. Please try again in a moment.",
       );

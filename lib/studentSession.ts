@@ -1,33 +1,74 @@
-"use client";
+import "server-only";
+import { cookies } from "next/headers";
+import type { NextRequest, NextResponse } from "next/server";
+import { STUDENT_SESSION_COOKIE } from "./studentSessionConstants";
 
-const KEY = "np_student";
+export { STUDENT_SESSION_COOKIE };
+
+const MAX_AGE_SECONDS = 8 * 60 * 60;
 
 export type StudentSession = {
   id: string;
-  firstName: string;
-  lastName: string;
-  level: string;
+  first_name: string;
+  last_name: string;
   username: string;
-  parentMemberId: string;
+  level: string;
+  parent_member_id: string;
 };
 
-export function setStudentSession(session: StudentSession): void {
-  if (typeof window === "undefined") return;
-  sessionStorage.setItem(KEY, JSON.stringify(session));
+function encode(session: StudentSession): string {
+  return Buffer.from(JSON.stringify(session), "utf8").toString("base64url");
 }
 
-export function getStudentSession(): StudentSession | null {
-  if (typeof window === "undefined") return null;
-  const raw = sessionStorage.getItem(KEY);
-  if (!raw) return null;
+function decode(value: string | undefined): StudentSession | null {
+  if (!value) return null;
   try {
-    return JSON.parse(raw) as StudentSession;
+    const json = Buffer.from(value, "base64url").toString("utf8");
+    const parsed = JSON.parse(json) as Partial<StudentSession>;
+    if (!parsed?.id || typeof parsed.id !== "string") return null;
+    return {
+      id: parsed.id,
+      first_name: parsed.first_name ?? "",
+      last_name: parsed.last_name ?? "",
+      username: parsed.username ?? "",
+      level: parsed.level ?? "",
+      parent_member_id: parsed.parent_member_id ?? "",
+    };
   } catch {
     return null;
   }
 }
 
-export function clearStudentSession(): void {
-  if (typeof window === "undefined") return;
-  sessionStorage.removeItem(KEY);
+export function setStudentSession(
+  response: NextResponse,
+  session: StudentSession,
+): void {
+  response.cookies.set(STUDENT_SESSION_COOKIE, encode(session), {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    maxAge: MAX_AGE_SECONDS,
+    path: "/",
+  });
+}
+
+export function getStudentSession(
+  request: NextRequest,
+): StudentSession | null {
+  return decode(request.cookies.get(STUDENT_SESSION_COOKIE)?.value);
+}
+
+export function clearStudentSession(response: NextResponse): void {
+  response.cookies.set(STUDENT_SESSION_COOKIE, "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    maxAge: 0,
+    path: "/",
+  });
+}
+
+// Convenience reader for server components / server actions.
+export function readStudentSessionFromCookies(): StudentSession | null {
+  return decode(cookies().get(STUDENT_SESSION_COOKIE)?.value);
 }

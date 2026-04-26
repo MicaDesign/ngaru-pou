@@ -1,14 +1,8 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Loader2, LogOut } from "lucide-react";
-import {
-  getStudentSession,
-  clearStudentSession,
-  type StudentSession,
-} from "@/lib/studentSession";
+import { LogOut } from "lucide-react";
+import { readStudentSessionFromCookies } from "@/lib/studentSession";
 
 const LEVEL_LABELS: Record<string, string> = {
   "te-pumanawa": "Te Pūmanawa",
@@ -17,34 +11,14 @@ const LEVEL_LABELS: Record<string, string> = {
 };
 
 export default function StudentDashboardPage() {
-  const [student, setStudent] = useState<StudentSession | null>(null);
-  const [checked, setChecked] = useState(false);
-
-  useEffect(() => {
-    const session = getStudentSession();
-    if (!session) {
-      window.location.href = "/student-login";
-      return;
-    }
-    setStudent(session);
-    setChecked(true);
-  }, []);
-
-  function handleSignOut() {
-    clearStudentSession();
-    window.location.href = "/student-login";
+  const session = readStudentSessionFromCookies();
+  if (!session) {
+    redirect("/student-login");
   }
 
-  if (!checked || !student) {
-    return (
-      <div className="min-h-screen bg-iron-depth flex items-center justify-center">
-        <Loader2 size={28} className="text-white/30 animate-spin" />
-      </div>
-    );
-  }
-
-  const greetingName = student.firstName?.trim() || student.username || "";
-  const levelLabel = LEVEL_LABELS[student.level] ?? student.level;
+  const greetingName =
+    session.first_name?.trim() || session.username || "";
+  const levelLabel = LEVEL_LABELS[session.level] ?? session.level;
 
   return (
     <div className="min-h-screen bg-iron-depth flex items-center justify-center px-4 py-16">
@@ -84,14 +58,15 @@ export default function StudentDashboardPage() {
         </div>
 
         <div className="flex justify-center mt-6">
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="inline-flex items-center gap-2 font-sans text-sm text-white/50 hover:text-white transition-colors"
-          >
-            <LogOut size={14} />
-            Sign out
-          </button>
+          <form action="/api/student-logout" method="POST">
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 font-sans text-sm text-white/50 hover:text-white transition-colors"
+            >
+              <LogOut size={14} />
+              Sign out
+            </button>
+          </form>
         </div>
       </div>
     </div>
