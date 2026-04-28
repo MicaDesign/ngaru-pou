@@ -46,7 +46,7 @@ export default function MessageBubble({ message, isMine, showSender, senderAvata
           className={`rounded-2xl px-4 py-2.5 ${
             isMine
               ? "bg-primary text-white rounded-br-sm"
-              : "bg-midnight-tidal border border-white/10 text-white rounded-bl-sm"
+              : "bg-white text-midnight-tidal rounded-bl-sm shadow-sm"
           }`}
         >
         {message.imageUrl && (
@@ -83,7 +83,7 @@ export default function MessageBubble({ message, isMine, showSender, senderAvata
         )}
         <p
           className={`font-sans text-[10px] mt-1 ${
-            isMine ? "text-white/60 text-right" : "text-white/35"
+            isMine ? "text-white/60 text-right" : "text-midnight-tidal/40"
           }`}
         >
           {formatTime(message.createdAt)}
