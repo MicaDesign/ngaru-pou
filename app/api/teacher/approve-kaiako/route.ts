@@ -99,14 +99,18 @@ export async function POST(request: Request) {
   if (action === "approve") {
     // Assign the Kaiako plan to the target member.
     const planRes = await adminRequest(
-      `/members/${encodeURIComponent(memberId)}/plans`,
+      `/members/${encodeURIComponent(memberId)}/add-plan-connection`,
       key,
       { method: "POST", body: { planId: KAIAKO_PLAN_ID } },
     );
     if (!planRes.ok) {
-      console.error("approve-kaiako: plan assignment failed", planRes);
+      console.error("approve-kaiako: plan assignment failed", JSON.stringify(planRes.json));
+      const msError =
+        (planRes.json as Record<string, unknown> | undefined)?.message ??
+        (planRes.json as Record<string, unknown> | undefined)?.error ??
+        `MemberStack responded ${planRes.status}`;
       return NextResponse.json(
-        { error: "plan assignment failed", status: planRes.status },
+        { error: `plan assignment failed: ${msError}` },
         { status: 502 },
       );
     }
