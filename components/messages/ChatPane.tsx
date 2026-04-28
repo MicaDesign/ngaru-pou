@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { MessageSquare, Settings } from "lucide-react";
 import { subscribeToMessages, sendMessage, type Message } from "@/lib/messaging/messages";
 import { markRoomRead } from "@/lib/messaging/readState";
@@ -25,7 +25,6 @@ export default function ChatPane({ room, me, allUsers }: Props) {
   const [sending, setSending] = useState(false);
   const [memberAvatars, setMemberAvatars] = useState<Record<string, string>>({});
   const [showGroupSettings, setShowGroupSettings] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!room) { setMessages([]); return; }
@@ -46,9 +45,6 @@ export default function ChatPane({ room, me, allUsers }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room?.id]);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   async function handleSend(text: string, imageFile: File | null) {
     if (!room || (!text.trim() && !imageFile)) return;
@@ -166,7 +162,6 @@ export default function ChatPane({ room, me, allUsers }: Props) {
             );
           })
         )}
-        <div ref={bottomRef} />
       </div>
 
       {/* Input */}
