@@ -27,7 +27,7 @@ const pillars: Pillar[] = [
   {
     icon: Trophy,
     heading: "Future-Ready Skills",
-    body: "From literacy and numeracy to critical thinking and digital fluency, Ngāruapō prepares students for te ao hurihuri — an ever-changing world.",
+    body: "From literacy and numeracy to critical thinking and digital fluency, Ngaru Pou prepares students for te ao hurihuri — an ever-changing world.",
   },
 ];
 

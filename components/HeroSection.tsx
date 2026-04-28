@@ -25,7 +25,7 @@ export default function HeroSection() {
         </h1>
 
         <p className="mx-auto mb-10 max-w-3xl font-sans text-[1.1rem] leading-[1.5] text-white/70 sm:text-[1.2rem]">
-          Ngāruapō supports Māori students to thrive in both te ao Māori and te
+          Ngaru Pou supports Māori students to thrive in both te ao Māori and te
           ao whānui. Through interactive lessons, real-world skills, and
           culturally relevant content, we nurture curiosity, resilience, and
           pride in who our learners are.

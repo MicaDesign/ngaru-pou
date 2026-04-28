@@ -22,7 +22,7 @@ const ngaMihi = localFont({
 export const metadata: Metadata = {
   title: "Ngaru Pou",
   description:
-    "Ngāruapō supports Māori students to thrive in both te ao Māori and te ao whānui.",
+    "Ngaru Pou supports Māori students to thrive in both te ao Māori and te ao whānui.",
   icons: {
     icon: "/images/logo-icon-4.svg",
   },

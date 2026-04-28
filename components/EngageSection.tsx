@@ -25,10 +25,10 @@ const featureCards: FeatureCard[] = [
   { icon: "/images/icon-1.svg", heading: "Culturally Relevant Insights", body: "Lessons are designed to spark curiosity and connect learning to real-life experiences and kaupapa Māori values." },
   { icon: "/images/icon-4.svg", heading: "Multimedia Lessons", body: "Video, quizzes, and interactive activities keep learning engaging, accessible, and easy to follow." },
   { icon: "/images/icon-14.svg", heading: "Recognized Achievement", body: "Students earn digital badges and milestones that reflect effort, growth, and academic progress." },
-  { icon: "/images/icon-9.svg", heading: "Learning Without Limits", body: "Access Ngāruapō anywhere, anytime — supporting rangatahi across Aotearoa and beyond." },
+  { icon: "/images/icon-9.svg", heading: "Learning Without Limits", body: "Access Ngaru Pou anywhere, anytime — supporting rangatahi across Aotearoa and beyond." },
   { icon: "/images/icon-3.svg", heading: "Active Practice & Application", body: "Students reinforce learning through exercises, reflections, and practical challenges that strengthen understanding." },
   { icon: "/images/icon-6.svg", heading: "Real-Time Progress Tracking", body: "Both learners and educators can monitor progress, identify strengths, and focus on areas needing support." },
-  { icon: "/images/icon-15.svg", heading: "Future-Ready Platform", body: "Designed to grow with schools and communities, Ngāruapō adapts to different learning needs and digital environments." },
+  { icon: "/images/icon-15.svg", heading: "Future-Ready Platform", body: "Designed to grow with schools and communities, Ngaru Pou adapts to different learning needs and digital environments." },
 ];
 
 export default function EngageSection() {
@@ -66,7 +66,7 @@ export default function EngageSection() {
           </h2>
           <p className="font-sans text-white/60 text-[1.2rem] leading-[1.5]">
             Meaningful education happens when students actively engage, build
-            understanding, and apply what they&apos;ve learned. Ngāruapō
+            understanding, and apply what they&apos;ve learned. Ngaru Pou
             supports every step of that journey — from first question to
             recognised achievement — creating pathways that are both culturally
             grounded and future-ready.

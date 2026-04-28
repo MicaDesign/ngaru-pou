@@ -28,7 +28,7 @@ export default function IdentitySection() {
               </h2>
             </div>
             <p className="font-sans text-midnight-tidal/70 text-[1.2rem] leading-[1.5]">
-              Ngāruapō was created to support Māori learners in a way that feels
+              Ngaru Pou was created to support Māori learners in a way that feels
               relevant, empowering, and future-focused. Our platform blends
               academic excellence with tikanga, identity, and real-world skills
               — helping students grow in confidence, capability, and connection
