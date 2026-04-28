@@ -20,7 +20,14 @@ import {
   fullName,
   type ChildProfile,
 } from "@/lib/studentProfiles";
+import {
+  getMemberAvatarUrl,
+  uploadMemberAvatar,
+  getStudentAvatarUrl,
+  uploadStudentAvatar,
+} from "@/lib/avatars";
 import type { Level } from "@/lib/airtable";
+import AvatarUpload from "@/components/AvatarUpload";
 
 type Props = {
   levels: Level[];
@@ -51,6 +58,8 @@ export default function ParentDashboardView({ levels }: Props) {
   const [denied, setDenied] = useState(false);
   const [children, setChildren] = useState<ChildProfile[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [studentAvatars, setStudentAvatars] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -84,9 +93,21 @@ export default function ParentDashboardView({ levels }: Props) {
           return;
         }
 
-        const kids = await getChildrenForParent(data.id);
+        const [kids, memberAvatar] = await Promise.all([
+          getChildrenForParent(data.id),
+          getMemberAvatarUrl(data.id),
+        ]);
         if (cancelled) return;
         setChildren(kids);
+        setAvatarUrl(memberAvatar);
+        // Load student avatars
+        const avatarEntries = await Promise.all(
+          kids.map(async (k) => [k.id, await getStudentAvatarUrl(k.id)] as [string, string | null])
+        );
+        if (cancelled) return;
+        const avatarMap: Record<string, string> = {};
+        avatarEntries.forEach(([id, url]) => { if (url) avatarMap[id] = url; });
+        setStudentAvatars(avatarMap);
         setDataLoading(false);
       } catch (err) {
         console.error(err);
@@ -139,17 +160,30 @@ export default function ParentDashboardView({ levels }: Props) {
     <div className="min-h-[calc(100vh-6rem)] bg-midnight-tidal">
       <section className="site-container py-16 md:py-20">
         <div className="rounded-2xl bg-primary shadow-xl shadow-primary/20 px-7 py-8 md:px-10 md:py-10">
-          <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
-            Parent dashboard
-          </p>
-          <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
-            kia ora{firstName ? `, ${firstName}` : ""}
-          </h1>
-          <div className="mt-4 flex flex-wrap gap-5 text-sm font-sans text-white/85">
-            <span className="inline-flex items-center gap-2">
-              <Users size={14} />
-              {children.length} tamaiti enrolled
-            </span>
+          <div className="flex items-center gap-6">
+            {member?.id && (
+              <AvatarUpload
+                currentUrl={avatarUrl}
+                name={firstName || "Me"}
+                size={72}
+                onUpload={(file) => uploadMemberAvatar(member.id!, file)}
+                onSaved={setAvatarUrl}
+              />
+            )}
+            <div>
+              <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
+                Parent dashboard
+              </p>
+              <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
+                kia ora{firstName ? `, ${firstName}` : ""}
+              </h1>
+              <div className="mt-4 flex flex-wrap gap-5 text-sm font-sans text-white/85">
+                <span className="inline-flex items-center gap-2">
+                  <Users size={14} />
+                  {children.length} tamaiti enrolled
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -172,6 +206,8 @@ export default function ParentDashboardView({ levels }: Props) {
                   key={child.id}
                   child={child}
                   level={levelBySlug[child.level]}
+                  avatarUrl={studentAvatars[child.id] ?? null}
+                  onAvatarSaved={(url) => setStudentAvatars((prev) => ({ ...prev, [child.id]: url }))}
                 />
               ))}
             </div>
@@ -204,9 +240,13 @@ function EmptyState() {
 function ChildCard({
   child,
   level,
+  avatarUrl,
+  onAvatarSaved,
 }: {
   child: ChildProfile;
   level?: Level;
+  avatarUrl: string | null;
+  onAvatarSaved: (url: string) => void;
 }) {
   const age = ageInYears(child.dateOfBirth);
   const thumbnail = level?.thumbnail?.[0]?.url;
@@ -224,7 +264,17 @@ function ChildCard({
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-midnight-tidal via-midnight-tidal/40 to-transparent" />
-        <div className="absolute left-5 bottom-4 right-5">
+        {/* Child avatar — bottom left, overlapping */}
+        <div className="absolute left-4 bottom-3">
+          <AvatarUpload
+            currentUrl={avatarUrl}
+            name={fullName(child)}
+            size={56}
+            onUpload={(file) => uploadStudentAvatar(child.id, file)}
+            onSaved={onAvatarSaved}
+          />
+        </div>
+        <div className="absolute left-[4.5rem] bottom-4 right-5">
           <p className="font-sans text-xs uppercase tracking-[0.2em] text-primary mb-1">
             {level?.name ?? child.level}
           </p>

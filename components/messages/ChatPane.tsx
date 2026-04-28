@@ -6,6 +6,8 @@ import { subscribeToMessages, sendMessage, type Message } from "@/lib/messaging/
 import { markRoomRead } from "@/lib/messaging/readState";
 import type { FsUser } from "@/lib/messaging/users";
 import type { Room } from "@/lib/messaging/rooms";
+import { getMemberAvatarUrl } from "@/lib/avatars";
+import Avatar from "@/components/Avatar";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
 
@@ -20,6 +22,7 @@ type Props = {
 export default function ChatPane({ room, me, allUsers }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sending, setSending] = useState(false);
+  const [memberAvatars, setMemberAvatars] = useState<Record<string, string>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,6 +31,14 @@ export default function ChatPane({ room, me, allUsers }: Props) {
     const unsub = subscribeToMessages(room.id, (msgs) => {
       setMessages(msgs);
       markRoomRead(room.id);
+    });
+    // Load avatars for all room members
+    room.memberIds.forEach((id) => {
+      if (!memberAvatars[id]) {
+        getMemberAvatarUrl(id).then((url) => {
+          if (url) setMemberAvatars((prev) => ({ ...prev, [id]: url }));
+        });
+      }
     });
     return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,13 +100,12 @@ export default function ChatPane({ room, me, allUsers }: Props) {
     );
   }
 
+  const otherId = room.type === "dm" ? room.memberIds.find((id) => id !== me.id) : null;
   const roomLabel =
     room.type === "group"
       ? room.name
-      : (() => {
-          const otherId = room.memberIds.find((id) => id !== me.id);
-          return otherId ? room.memberNames[otherId] ?? "Unknown" : "Unknown";
-        })();
+      : (otherId ? room.memberNames[otherId] ?? "Unknown" : "Unknown");
+  const otherAvatarUrl = otherId ? memberAvatars[otherId] ?? null : null;
 
   const memberCount = room.memberIds.length;
 
@@ -104,9 +114,11 @@ export default function ChatPane({ room, me, allUsers }: Props) {
       {/* Room header */}
       <div className="flex items-center gap-3 px-5 py-3.5 border-b border-white/10 shrink-0">
         {room.type === "group" ? (
-          <Users size={16} className="text-primary shrink-0" />
+          <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+            <Users size={15} className="text-primary" />
+          </div>
         ) : (
-          <MessageSquare size={16} className="text-primary shrink-0" />
+          <Avatar src={otherAvatarUrl} name={roomLabel} size={32} />
         )}
         <div>
           <p className="font-sans text-sm font-semibold text-white">{roomLabel}</p>
@@ -138,6 +150,7 @@ export default function ChatPane({ room, me, allUsers }: Props) {
                 message={msg}
                 isMine={msg.senderId === me.id}
                 showSender={showSender}
+                senderAvatarUrl={memberAvatars[msg.senderId] ?? null}
               />
             );
           })

@@ -3,11 +3,13 @@
 /* eslint-disable @next/next/no-img-element */
 import { FileText, Download } from "lucide-react";
 import type { Message } from "@/lib/messaging/messages";
+import Avatar from "@/components/Avatar";
 
 type Props = {
   message: Message;
   isMine: boolean;
   showSender: boolean;
+  senderAvatarUrl?: string | null;
 };
 
 function formatTime(ts: number): string {
@@ -21,21 +23,32 @@ function isEmojiOnly(text: string): boolean {
   return !/[a-zA-Z0-9!?,.'";:@#$%^&*()\-+=[\]{}|\\/<>~`]/.test(trimmed);
 }
 
-export default function MessageBubble({ message, isMine, showSender }: Props) {
+export default function MessageBubble({ message, isMine, showSender, senderAvatarUrl }: Props) {
   return (
-    <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} mb-1`}>
-      {showSender && (
-        <p className="font-sans text-[11px] text-white/40 mb-1 px-1">
-          {message.senderName}
-        </p>
+    <div className={`flex ${isMine ? "flex-row-reverse" : "flex-row"} items-end gap-2 mb-1`}>
+      {/* Avatar — other users only */}
+      {!isMine && (
+        <div className="shrink-0 mb-0.5">
+          {showSender
+            ? <Avatar src={senderAvatarUrl} name={message.senderName} size={28} />
+            : <div className="w-7" />
+          }
+        </div>
       )}
-      <div
-        className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
-          isMine
-            ? "bg-primary text-white rounded-br-sm"
-            : "bg-midnight-tidal border border-white/10 text-white rounded-bl-sm"
-        }`}
-      >
+
+      <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[75%]`}>
+        {showSender && !isMine && (
+          <p className="font-sans text-[11px] text-white/40 mb-1 px-1">
+            {message.senderName}
+          </p>
+        )}
+        <div
+          className={`rounded-2xl px-4 py-2.5 ${
+            isMine
+              ? "bg-primary text-white rounded-br-sm"
+              : "bg-midnight-tidal border border-white/10 text-white rounded-bl-sm"
+          }`}
+        >
         {message.imageUrl && (
           <div className="mb-2 rounded-lg overflow-hidden">
             <img
@@ -75,6 +88,7 @@ export default function MessageBubble({ message, isMine, showSender }: Props) {
         >
           {formatTime(message.createdAt)}
         </p>
+        </div>
       </div>
     </div>
   );

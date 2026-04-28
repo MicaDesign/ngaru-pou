@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import {
   Menu,
   X,
-  User,
   ChevronDown,
   LayoutDashboard,
   BookOpen,
@@ -15,6 +14,8 @@ import {
 } from "lucide-react";
 import { getMemberstack } from "@/lib/memberstack";
 import NavBell from "@/components/NavBell";
+import Avatar from "@/components/Avatar";
+import { getMemberAvatarUrl } from "@/lib/avatars";
 
 const navLinks = [
   { label: "Levels", href: "/dashboard/levels" },
@@ -49,6 +50,7 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [member, setMember] = useState<Member>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -62,7 +64,10 @@ export default function Nav() {
       return;
     }
     ms.getCurrentMember()
-      .then(({ data }: { data: Member }) => setMember(data))
+      .then(({ data }: { data: Member }) => {
+        setMember(data);
+        if (data?.id) getMemberAvatarUrl(data.id).then(setAvatarUrl);
+      })
       .catch(() => setMember(null))
       .finally(() => setChecking(false));
   }, []);
@@ -95,9 +100,9 @@ export default function Nav() {
         onClick={() => setUserMenuOpen((v) => !v)}
         aria-label="User menu"
         aria-expanded={userMenuOpen}
-        className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/15 px-3 py-2 text-white/70 transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.08] hover:text-white"
+        className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/15 px-2 py-1 text-white/70 transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.08] hover:text-white"
       >
-        <User size={18} />
+        <Avatar src={avatarUrl} name={displayName} size={28} />
         <ChevronDown
           size={16}
           className={`transition-transform duration-200 ${

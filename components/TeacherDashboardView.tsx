@@ -27,6 +27,13 @@ import {
   type EoiEntry,
   type SiteSettings,
 } from "@/lib/settings";
+import {
+  getMemberAvatarUrl,
+  uploadMemberAvatar,
+  getAllStudentAvatarUrls,
+} from "@/lib/avatars";
+import AvatarUpload from "@/components/AvatarUpload";
+import Avatar from "@/components/Avatar";
 import { getMemberstack } from "@/lib/memberstack";
 import { isKaiako } from "@/lib/kaiako";
 import {
@@ -81,6 +88,8 @@ export default function TeacherDashboardView({ levels }: Props) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [pendingKaiako, setPendingKaiako] = useState<KaiakoProfile[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [studentAvatars, setStudentAvatars] = useState<Record<string, string>>({});
   const [enrollmentOpen, setEnrollmentOpenState] = useState<boolean>(true);
   const [togglingEnrollment, setTogglingEnrollment] = useState(false);
   const [eois, setEois] = useState<EoiEntry[]>([]);
@@ -120,18 +129,22 @@ export default function TeacherDashboardView({ levels }: Props) {
         setMember(data);
         setAuthLoading(false);
 
-        const [allStudents, allQuestions, pendingProfiles, siteSettings, eoiList] = await Promise.all([
+        const [allStudents, allQuestions, pendingProfiles, siteSettings, eoiList, memberAvatar, studentAvatarMap] = await Promise.all([
           getAllStudentProfiles(),
           getAllQuestions(),
           getPendingKaiakoProfiles(),
           getSiteSettings(),
           getAllEois(),
+          getMemberAvatarUrl(data.id),
+          getAllStudentAvatarUrls(),
         ]);
         if (cancelled) return;
 
         setStudents(allStudents);
         setQuestions(allQuestions);
         setPendingKaiako(pendingProfiles);
+        setAvatarUrl(memberAvatar);
+        setStudentAvatars(studentAvatarMap);
         setEnrollmentOpenState(siteSettings.enrollmentOpen);
         setAnnouncement({
           visible: siteSettings.announcementVisible,
@@ -232,28 +245,41 @@ export default function TeacherDashboardView({ levels }: Props) {
       <section className="site-container py-16 md:py-20">
         {/* Hero */}
         <div className="rounded-2xl bg-primary shadow-xl shadow-primary/20 px-7 py-8 md:px-10 md:py-10">
-          <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
-            Kaiako dashboard
-          </p>
-          <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
-            kia ora{firstName ? `, ${firstName}` : ""} — kaiako dashboard
-          </h1>
-          <div className="mt-4 flex flex-wrap gap-5 text-sm font-sans text-white/85">
-            <span className="inline-flex items-center gap-2">
-              <Users size={14} />
-              {students.length} student{students.length === 1 ? "" : "s"}
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <MessageSquare size={14} />
-              {unansweredQuestions.length} unanswered · {answeredCount} answered
-            </span>
-            {pendingKaiako.length > 0 && (
-              <span className="inline-flex items-center gap-2 text-semantic-yellow">
-                <UserCheck size={14} />
-                {pendingKaiako.length} kaiako request
-                {pendingKaiako.length === 1 ? "" : "s"} pending
-              </span>
+          <div className="flex items-center gap-6">
+            {member?.id && (
+              <AvatarUpload
+                currentUrl={avatarUrl}
+                name={firstName || "Kaiako"}
+                size={72}
+                onUpload={(file) => uploadMemberAvatar(member.id!, file)}
+                onSaved={setAvatarUrl}
+              />
             )}
+            <div>
+              <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
+                Kaiako dashboard
+              </p>
+              <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
+                kia ora{firstName ? `, ${firstName}` : ""} — kaiako dashboard
+              </h1>
+              <div className="mt-4 flex flex-wrap gap-5 text-sm font-sans text-white/85">
+                <span className="inline-flex items-center gap-2">
+                  <Users size={14} />
+                  {students.length} student{students.length === 1 ? "" : "s"}
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <MessageSquare size={14} />
+                  {unansweredQuestions.length} unanswered · {answeredCount} answered
+                </span>
+                {pendingKaiako.length > 0 && (
+                  <span className="inline-flex items-center gap-2 text-semantic-yellow">
+                    <UserCheck size={14} />
+                    {pendingKaiako.length} kaiako request
+                    {pendingKaiako.length === 1 ? "" : "s"} pending
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -281,6 +307,7 @@ export default function TeacherDashboardView({ levels }: Props) {
             students={students}
             loading={dataLoading}
             levelBySlug={levelBySlug}
+            studentAvatars={studentAvatars}
           />
         </div>
 
@@ -417,10 +444,12 @@ function StudentsSection({
   students,
   loading,
   levelBySlug,
+  studentAvatars,
 }: {
   students: ChildProfile[];
   loading: boolean;
   levelBySlug: Record<string, Level>;
+  studentAvatars: Record<string, string>;
 }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-iron-depth p-7 md:p-8">
@@ -441,7 +470,7 @@ function StudentsSection({
       ) : (
         <ul className="divide-y divide-white/10">
           {students.map((s) => (
-            <StudentCard key={s.id} student={s} levelBySlug={levelBySlug} />
+            <StudentCard key={s.id} student={s} levelBySlug={levelBySlug} avatarUrl={studentAvatars[s.id] ?? null} />
           ))}
         </ul>
       )}
@@ -452,9 +481,11 @@ function StudentsSection({
 function StudentCard({
   student,
   levelBySlug,
+  avatarUrl,
 }: {
   student: ChildProfile;
   levelBySlug: Record<string, Level>;
+  avatarUrl: string | null;
 }) {
   const level = levelBySlug[student.level];
   const levelLabel = level?.name ?? LEVEL_LABELS[student.level] ?? student.level;
@@ -462,8 +493,9 @@ function StudentCard({
 
   return (
     <li className="py-4">
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
+      <div className="flex items-start gap-3 flex-wrap">
+        <Avatar src={avatarUrl} name={studentFullName(student)} size={36} className="mt-0.5 shrink-0" />
+        <div className="flex-1">
           <p className="font-sans text-base font-medium text-white">
             {studentFullName(student)}
           </p>
