@@ -143,10 +143,10 @@ export default function ChatPane({ room, me, allUsers }: Props) {
         </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-1 bg-salt-mist">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="font-sans text-sm text-white/30">
+            <p className="font-sans text-sm text-midnight-tidal/40">
               No messages yet — say kia ora!
             </p>
           </div>

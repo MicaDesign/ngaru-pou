@@ -38,7 +38,7 @@ export default function MessageBubble({ message, isMine, showSender, senderAvata
 
       <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[75%]`}>
         {showSender && !isMine && (
-          <p className="font-sans text-[11px] text-white/40 mb-1 px-1">
+          <p className="font-sans text-[11px] text-midnight-tidal/50 mb-1 px-1">
             {message.senderName}
           </p>
         )}
