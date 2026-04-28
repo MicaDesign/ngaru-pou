@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Nav from "./Nav";
 import Footer from "./Footer";
+import AnnouncementBanner from "./AnnouncementBanner";
 
 const AUTH_ROUTES = [
   "/login",
@@ -24,6 +25,7 @@ export default function LayoutShell({
 
   return (
     <>
+      {!isAuthRoute && <AnnouncementBanner />}
       {!isAuthRoute && <Nav />}
       <main className="flex-1">{children}</main>
       {!isAuthRoute && <Footer />}
