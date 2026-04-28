@@ -14,11 +14,11 @@ function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-const EMOJI_ONLY_RE = /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\s]+$/u;
-
 function isEmojiOnly(text: string): boolean {
   const trimmed = text.trim();
-  return trimmed.length > 0 && trimmed.length <= 12 && EMOJI_ONLY_RE.test(trimmed);
+  if (!trimmed || trimmed.length > 16) return false;
+  // No letters, digits, or common punctuation means it's emoji/symbol only
+  return !/[a-zA-Z0-9!?,.'";:@#$%^&*()\-+=[\]{}|\\/<>~`]/.test(trimmed);
 }
 
 export default function MessageBubble({ message, isMine, showSender }: Props) {
