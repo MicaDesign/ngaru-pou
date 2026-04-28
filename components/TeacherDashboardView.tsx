@@ -14,7 +14,17 @@ import {
   AtSign,
   Cake,
   HeartPulse,
+  Settings,
+  MailOpen,
+  Phone,
+  Baby,
 } from "lucide-react";
+import {
+  getEnrollmentOpen,
+  setEnrollmentOpen,
+  getAllEois,
+  type EoiEntry,
+} from "@/lib/settings";
 import { getMemberstack } from "@/lib/memberstack";
 import { isKaiako } from "@/lib/kaiako";
 import {
@@ -69,6 +79,9 @@ export default function TeacherDashboardView({ levels }: Props) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [pendingKaiako, setPendingKaiako] = useState<KaiakoProfile[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [enrollmentOpen, setEnrollmentOpenState] = useState<boolean>(true);
+  const [togglingEnrollment, setTogglingEnrollment] = useState(false);
+  const [eois, setEois] = useState<EoiEntry[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -97,16 +110,20 @@ export default function TeacherDashboardView({ levels }: Props) {
         setMember(data);
         setAuthLoading(false);
 
-        const [allStudents, allQuestions, pendingProfiles] = await Promise.all([
+        const [allStudents, allQuestions, pendingProfiles, enrollmentStatus, eoiList] = await Promise.all([
           getAllStudentProfiles(),
           getAllQuestions(),
           getPendingKaiakoProfiles(),
+          getEnrollmentOpen(),
+          getAllEois(),
         ]);
         if (cancelled) return;
 
         setStudents(allStudents);
         setQuestions(allQuestions);
         setPendingKaiako(pendingProfiles);
+        setEnrollmentOpenState(enrollmentStatus);
+        setEois(eoiList);
         setDataLoading(false);
       } catch (err) {
         console.error(err);
@@ -143,6 +160,18 @@ export default function TeacherDashboardView({ levels }: Props) {
 
   function handleKaiakoActioned(profileId: string) {
     setPendingKaiako((prev) => prev.filter((p) => p.id !== profileId));
+  }
+
+  async function handleToggleEnrollment() {
+    if (togglingEnrollment) return;
+    setTogglingEnrollment(true);
+    const next = !enrollmentOpen;
+    try {
+      await setEnrollmentOpen(next);
+      setEnrollmentOpenState(next);
+    } finally {
+      setTogglingEnrollment(false);
+    }
   }
 
   if (authLoading) {
@@ -224,6 +253,48 @@ export default function TeacherDashboardView({ levels }: Props) {
             loading={dataLoading}
             levelBySlug={levelBySlug}
           />
+        </div>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          {/* Enrollment settings toggle */}
+          <div className="rounded-2xl border border-white/10 bg-iron-depth p-7 md:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <Settings size={20} className="text-primary" />
+              <h2 className="font-display text-2xl text-white">settings</h2>
+            </div>
+            <div className="flex items-center justify-between gap-4 rounded-xl bg-midnight-tidal border border-white/10 px-5 py-4">
+              <div>
+                <p className="font-sans text-sm font-medium text-white">
+                  New enrolments
+                </p>
+                <p className="font-sans text-xs text-white/50 mt-0.5">
+                  {enrollmentOpen
+                    ? "Parents can currently sign up and enrol children."
+                    : "Registrations are closed — visitors see an expression of interest form instead."}
+                </p>
+              </div>
+              <button
+                onClick={handleToggleEnrollment}
+                disabled={togglingEnrollment || dataLoading}
+                aria-label={enrollmentOpen ? "Close enrolments" : "Open enrolments"}
+                className={`relative shrink-0 h-7 w-12 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                  enrollmentOpen ? "bg-semantic-green" : "bg-white/15"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${
+                    enrollmentOpen ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+            <p className="font-sans text-xs text-white/35 mt-3 px-1">
+              This toggle controls the parent card on the onboarding page in real time.
+            </p>
+          </div>
+
+          {/* EOI submissions */}
+          <EoiSection eois={eois} loading={dataLoading} />
         </div>
       </section>
     </div>
@@ -580,6 +651,73 @@ function QuestionCard({
         </form>
       )}
     </li>
+  );
+}
+
+function EoiSection({ eois, loading }: { eois: EoiEntry[]; loading: boolean }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-iron-depth p-7 md:p-8">
+      <div className="flex items-center gap-3 mb-6">
+        <MailOpen size={20} className="text-primary" />
+        <h2 className="font-display text-2xl text-white">expressions of interest</h2>
+        {eois.length > 0 && (
+          <span className="ml-auto inline-flex items-center justify-center h-6 min-w-6 rounded-full bg-primary/15 text-primary font-sans text-xs font-medium px-2">
+            {eois.length}
+          </span>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-6">
+          <Loader2 size={20} className="text-white/30 animate-spin" />
+        </div>
+      ) : eois.length === 0 ? (
+        <p className="font-sans text-sm text-white/50 leading-relaxed">
+          No expressions of interest yet. They appear here when enrolments are closed and parents fill in the interest form.
+        </p>
+      ) : (
+        <ul className="divide-y divide-white/10 max-h-96 overflow-y-auto">
+          {eois.map((e) => (
+            <li key={e.id} className="py-4">
+              <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+                <p className="font-sans text-sm font-medium text-white">
+                  {e.firstName} {e.lastName}
+                </p>
+                <p className="font-sans text-xs text-white/35">
+                  {new Date(e.createdAt).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}
+                </p>
+              </div>
+              <div className="flex flex-col gap-1 mt-1">
+                <a
+                  href={`mailto:${e.email}`}
+                  className="inline-flex items-center gap-1.5 font-sans text-xs text-primary hover:text-primary-light transition-colors"
+                >
+                  <MailOpen size={11} />
+                  {e.email}
+                </a>
+                {e.phone && (
+                  <span className="inline-flex items-center gap-1.5 font-sans text-xs text-white/50">
+                    <Phone size={11} />
+                    {e.phone}
+                  </span>
+                )}
+                {e.childrenCount && (
+                  <span className="inline-flex items-center gap-1.5 font-sans text-xs text-white/50">
+                    <Baby size={11} />
+                    {e.childrenCount} {Number(e.childrenCount) === 1 ? "child" : "children"}
+                  </span>
+                )}
+              </div>
+              {e.message && (
+                <p className="font-sans text-xs text-white/55 leading-snug mt-2 italic">
+                  &ldquo;{e.message}&rdquo;
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

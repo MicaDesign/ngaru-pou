@@ -4,6 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Globe, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getMemberstack } from "@/lib/memberstack";
+
+const MEMBER_ONLY_HREFS = new Set([
+  "/enrolment/code-of-conduct",
+  "/enrolment/uniform-regulations",
+  "/enrolment/handy-hints",
+]);
 
 const footerColumns = [
   [
@@ -27,6 +35,15 @@ const footerColumns = [
 
 export default function Footer() {
   const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const ms = getMemberstack();
+    if (!ms) return;
+    ms.getCurrentMember().then((res: { data?: { id?: string } | null }) => {
+      setIsLoggedIn(!!res.data?.id);
+    }).catch(() => {});
+  }, []);
 
   return (
     <footer className="border-t border-white/[0.11] bg-midnight-tidal pt-16 pb-8">
@@ -45,7 +62,7 @@ export default function Footer() {
           </Link>
           {footerColumns.map((col, i) => (
             <ul key={i} className="flex flex-col gap-1 items-start">
-              {col.map(({ label, href }) => {
+              {col.filter(({ href }) => !MEMBER_ONLY_HREFS.has(href) || isLoggedIn).map(({ label, href }) => {
                 const isActive = pathname === href;
                 return (
                   <li key={label}>
