@@ -23,6 +23,7 @@ export type Room = {
   id: string;
   type: "dm" | "group";
   name: string;
+  avatarUrl?: string | null;
   memberIds: string[];
   memberNames: Record<string, string>;
   createdAt: number;
@@ -31,6 +32,10 @@ export type Room = {
   lastMessageAt: number | null;
   lastSenderId: string | null;
 };
+
+export async function updateGroupAvatar(roomId: string, url: string): Promise<void> {
+  await updateDoc(doc(getDb(), ROOMS, roomId), { avatarUrl: url });
+}
 
 function dmRoomId(a: string, b: string): string {
   return `dm_${[a, b].sort().join("_")}`;
@@ -126,7 +131,10 @@ export function subscribeToMyRooms(
     where("memberIds", "array-contains", memberId),
   );
   return onSnapshot(q, (snap) => {
-    const rooms: Room[] = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Room, "id">) }));
+    const rooms: Room[] = snap.docs.map((d) => {
+      const data = d.data();
+      return { id: d.id, avatarUrl: data.avatarUrl ?? null, ...(data as Omit<Room, "id" | "avatarUrl">) };
+    });
     rooms.sort((a, b) => (b.lastMessageAt ?? b.createdAt) - (a.lastMessageAt ?? a.createdAt));
     onUpdate(rooms);
   });

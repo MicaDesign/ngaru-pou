@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Users, MessageSquare, Search, Plus } from "lucide-react";
+import { MessageSquare, Search, Plus } from "lucide-react";
 import type { Room } from "@/lib/messaging/rooms";
 import type { FsUser } from "@/lib/messaging/users";
+import Avatar from "@/components/Avatar";
 
 type Me = { id: string; displayName: string; email: string; isKaiakoMember: boolean };
 
@@ -72,17 +73,21 @@ export default function RoomList({
             : "hover:bg-white/5 border border-transparent"
         }`}
       >
-        <div className="flex items-center gap-2 mb-0.5">
+          <div className="flex items-center gap-2.5">
           {room.type === "group" ? (
-            <Users size={13} className="text-white/40 shrink-0" />
+            <Avatar src={room.avatarUrl} name={label} size={30} />
           ) : (
-            <MessageSquare size={13} className="text-white/40 shrink-0" />
+            <div className="w-[30px] h-[30px] rounded-full bg-white/5 flex items-center justify-center shrink-0">
+              <MessageSquare size={13} className="text-white/40" />
+            </div>
           )}
-          <span className="font-sans text-sm font-medium text-white truncate">{label}</span>
+          <div className="min-w-0 flex-1">
+            <p className="font-sans text-sm font-medium text-white truncate">{label}</p>
+            {preview && (
+              <p className="font-sans text-xs text-white/40 truncate">{preview}</p>
+            )}
+          </div>
         </div>
-        {preview && (
-          <p className="font-sans text-xs text-white/40 truncate pl-5">{preview}</p>
-        )}
       </button>
     );
   }

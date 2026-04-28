@@ -48,6 +48,10 @@ export async function getStudentAvatarUrl(studentId: string): Promise<string | n
   }
 }
 
+export async function uploadGroupAvatar(roomId: string, file: File): Promise<string> {
+  return uploadAvatar(`np_avatars/groups/${roomId}`, file);
+}
+
 export async function getAllStudentAvatarUrls(): Promise<Record<string, string>> {
   try {
     const db = getDb();
