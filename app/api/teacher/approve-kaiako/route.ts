@@ -6,6 +6,7 @@ const ADMIN_BASE = "https://admin.memberstack.com";
 type PlanConnection = {
   planId?: string;
   active?: boolean;
+  status?: string;
 };
 
 type AdminMember = {
@@ -90,7 +91,7 @@ export async function POST(request: Request) {
   }
   const caller = extractMember(callerRes.json);
   const callerIsKaiako = (caller?.planConnections ?? []).some(
-    (c) => c.planId === KAIAKO_PLAN_ID && c.active === true,
+    (c) => c.planId === KAIAKO_PLAN_ID && (c.active === true || c.status === "ACTIVE"),
   );
   if (!callerIsKaiako) {
     return NextResponse.json({ error: "kaiako plan required" }, { status: 403 });
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
   if (action === "approve") {
     // Assign the Kaiako plan to the target member.
     const planRes = await adminRequest(
-      `/members/${encodeURIComponent(memberId)}/add-plan-connection`,
+      `/members/${encodeURIComponent(memberId)}/add-plan`,
       key,
       { method: "POST", body: { planId: KAIAKO_PLAN_ID } },
     );
