@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MessageSquare, Settings } from "lucide-react";
 import { subscribeToMessages, sendMessage, type Message } from "@/lib/messaging/messages";
 import { markRoomRead } from "@/lib/messaging/readState";
@@ -25,6 +25,11 @@ export default function ChatPane({ room, me, allUsers }: Props) {
   const [sending, setSending] = useState(false);
   const [memberAvatars, setMemberAvatars] = useState<Record<string, string>>({});
   const [showGroupSettings, setShowGroupSettings] = useState(false);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (messagesContainerRef.current) messagesContainerRef.current.scrollTop = 0;
+  }, [room?.id]);
 
   useEffect(() => {
     if (!room) { setMessages([]); return; }
@@ -138,7 +143,7 @@ export default function ChatPane({ room, me, allUsers }: Props) {
         </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <p className="font-sans text-sm text-white/30">
