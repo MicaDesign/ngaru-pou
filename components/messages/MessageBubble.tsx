@@ -14,6 +14,13 @@ function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+const EMOJI_ONLY_RE = /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\s]+$/u;
+
+function isEmojiOnly(text: string): boolean {
+  const trimmed = text.trim();
+  return trimmed.length > 0 && trimmed.length <= 12 && EMOJI_ONLY_RE.test(trimmed);
+}
+
 export default function MessageBubble({ message, isMine, showSender }: Props) {
   return (
     <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} mb-1`}>
@@ -57,7 +64,7 @@ export default function MessageBubble({ message, isMine, showSender }: Props) {
           </a>
         )}
         {message.text && (
-          <p className="font-sans text-sm leading-relaxed whitespace-pre-wrap break-words">
+          <p className={`whitespace-pre-wrap break-words ${isEmojiOnly(message.text) ? "text-5xl leading-tight" : "font-sans text-sm leading-relaxed"}`}>
             {message.text}
           </p>
         )}
