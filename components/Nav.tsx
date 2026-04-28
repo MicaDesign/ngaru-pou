@@ -14,6 +14,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { getMemberstack } from "@/lib/memberstack";
+import NavBell from "@/components/NavBell";
 
 const navLinks = [
   { label: "Levels", href: "/dashboard/levels" },
@@ -22,6 +23,7 @@ const navLinks = [
 ];
 
 type Member = {
+  id?: string;
   auth?: { email?: string };
   customFields?: Record<string, unknown>;
 } | null;
@@ -241,6 +243,7 @@ export default function Nav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3 min-w-[180px] justify-end">
+          {member?.id && <NavBell memberId={member.id} />}
           {authButtons}
         </div>
 

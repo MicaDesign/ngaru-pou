@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CheckCircle, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import AuthGuard from "@/components/AuthGuard";
 import { useMember } from "@/components/MemberstackProvider";
+import { getMemberstack } from "@/lib/memberstack";
+import { createKaiakoProfile } from "@/lib/kaiakoProfiles";
 
 export default function KaiakoRequestPage() {
   return (
@@ -17,27 +19,59 @@ export default function KaiakoRequestPage() {
 
 function KaiakoRequestForm() {
   const { member } = useMember();
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [experience, setExperience] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!member) return;
-    const first = member.customFields?.["first-name"] ?? "";
-    const last = member.customFields?.["last-name"] ?? "";
-    const combined = `${first} ${last}`.trim();
-    if (combined) setFullName(combined);
+    const first = typeof member.customFields?.["first-name"] === "string"
+      ? member.customFields["first-name"]
+      : "";
+    const last = typeof member.customFields?.["last-name"] === "string"
+      ? member.customFields["last-name"]
+      : "";
+    if (first) setFirstName(first);
+    if (last) setLastName(last);
     if (member.auth?.email) setEmail(member.auth.email);
   }, [member]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submitting) return;
+    setError(null);
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setSubmitting(false);
-    setSubmitted(true);
+
+    try {
+      const ms = getMemberstack();
+      if (!ms) throw new Error("Sign-in service unavailable. Please refresh.");
+
+      const { data: me } = await ms.getCurrentMember();
+      if (!me?.id) throw new Error("Could not load your account. Please refresh and try again.");
+
+      const ok = await createKaiakoProfile({
+        memberId: me.id,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        experience: experience.trim(),
+      });
+
+      if (!ok) throw new Error("Could not save your request. Please try again.");
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error("kaiako-request submit failed", err);
+      setError(
+        err instanceof Error ? err.message : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const inputBase =
@@ -67,8 +101,8 @@ function KaiakoRequestForm() {
               request received
             </h1>
             <p className="font-sans text-white/60 leading-relaxed mb-6">
-              Your request has been received. Current kaiako will review
-              your application and you will be notified by email.
+              Your request has been received. Current kaiako will review your
+              application and you will be notified once approved.
             </p>
             <Link
               href="/"
@@ -83,24 +117,40 @@ function KaiakoRequestForm() {
               request kaiako access
             </h1>
             <p className="font-sans text-white/50 text-sm mb-6">
-              Tell us a little about yourself so the current kaiako can
-              review your request.
+              Tell us a little about yourself so the current kaiako can review
+              your request.
             </p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">
-                  Full name
-                </label>
-                <input
-                  type="text"
-                  required
-                  disabled={submitting}
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Your full name"
-                  className={inputBase}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-1.5">
+                    First name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    disabled={submitting}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="First name"
+                    className={inputBase}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-1.5">
+                    Last name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    disabled={submitting}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Last name"
+                    className={inputBase}
+                  />
+                </div>
               </div>
 
               <div>
@@ -120,8 +170,8 @@ function KaiakoRequestForm() {
 
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1.5">
-                  Tell us about your experience with Te Ao Haka and
-                  kaiako roles
+                  Tell us about your experience with Te Ao Haka and kaiako
+                  roles
                 </label>
                 <textarea
                   required
@@ -134,6 +184,15 @@ function KaiakoRequestForm() {
                 />
               </div>
 
+              {error && (
+                <div className="flex items-start gap-2 rounded-lg bg-semantic-red/10 border border-semantic-red/25 px-4 py-3">
+                  <AlertCircle size={16} className="text-semantic-red mt-0.5 shrink-0" />
+                  <span className="block text-semantic-red text-sm leading-snug">
+                    {error}
+                  </span>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={submitting}
@@ -141,8 +200,7 @@ function KaiakoRequestForm() {
               >
                 {submitting ? (
                   <>
-                    <Loader2 size={17} className="animate-spin" /> Sending
-                    request…
+                    <Loader2 size={17} className="animate-spin" /> Sending request…
                   </>
                 ) : (
                   "Submit request"

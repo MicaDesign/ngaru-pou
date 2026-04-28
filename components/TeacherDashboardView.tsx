@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Loader2,
   Users,
@@ -10,26 +9,38 @@ import {
   Send,
   Check,
   ShieldAlert,
-  ChevronRight,
+  UserCheck,
+  X,
+  AtSign,
+  Cake,
+  HeartPulse,
 } from "lucide-react";
 import { getMemberstack } from "@/lib/memberstack";
-import { isKaiako, KAIAKO_PLAN_ID } from "@/lib/kaiako";
-import {
-  getProgressByMemberId,
-  type ProgressRecord,
-} from "@/lib/progress";
-import { getStudents, fullName, type Student } from "@/lib/studentRegistry";
-import {
-  getTeacherMembers,
-  memberFullName,
-  type TeacherMember,
-} from "@/lib/teacherMembers";
+import { isKaiako } from "@/lib/kaiako";
 import {
   getAllQuestions,
   answerQuestion,
   type Question,
 } from "@/lib/questions";
+import {
+  getPendingKaiakoProfiles,
+  updateKaiakoProfileStatus,
+  fullName as kaiakoFullName,
+  type KaiakoProfile,
+} from "@/lib/kaiakoProfiles";
+import {
+  getAllStudentProfiles,
+  fullName as studentFullName,
+  ageInYears,
+  type ChildProfile,
+} from "@/lib/studentProfiles";
 import type { Level } from "@/lib/airtable";
+
+const LEVEL_LABELS: Record<string, string> = {
+  "te-pumanawa": "Te Pūmanawa",
+  "te-pukenga-rau": "Te Pūkenga Rau",
+  "te-pukenga": "Te Pūkenga",
+};
 
 type Props = {
   levels: Level[];
@@ -42,14 +53,6 @@ type Member = {
   planConnections?: { planId?: string; active?: boolean }[];
 } | null;
 
-type StudentSummary = {
-  memberId: string;
-  name: string;
-  email: string;
-  completedByLevel: Record<string, number>;
-  lastActivity: string;
-};
-
 function getFirstName(member: Member): string {
   const cf = member?.customFields;
   const v = cf?.["first-name"];
@@ -58,15 +61,13 @@ function getFirstName(member: Member): string {
   return email.split("@")[0] ?? "";
 }
 
-// Exported for reuse if the teacher route needs to redirect non-Kaiako members.
 export default function TeacherDashboardView({ levels }: Props) {
   const [member, setMember] = useState<Member>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [denied, setDenied] = useState(false);
-  const [teacherMembers, setTeacherMembers] = useState<TeacherMember[]>([]);
-  const [registry, setRegistry] = useState<Student[]>([]);
-  const [progress, setProgress] = useState<ProgressRecord[]>([]);
+  const [students, setStudents] = useState<ChildProfile[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [pendingKaiako, setPendingKaiako] = useState<KaiakoProfile[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
@@ -96,38 +97,16 @@ export default function TeacherDashboardView({ levels }: Props) {
         setMember(data);
         setAuthLoading(false);
 
-        const [allMembers, allStudents, allQuestions] = await Promise.all([
-          getTeacherMembers(),
-          getStudents(),
+        const [allStudents, allQuestions, pendingProfiles] = await Promise.all([
+          getAllStudentProfiles(),
           getAllQuestions(),
+          getPendingKaiakoProfiles(),
         ]);
         if (cancelled) return;
 
-        // Only students — strip Kaiako accounts out of the member list.
-        const studentMembers = allMembers.filter(
-          (m) =>
-            !m.planConnections.some(
-              (c) => c.planId === KAIAKO_PLAN_ID && c.active === true,
-            ),
-        );
-
-        // Union the admin-API member IDs with student_registry IDs, then fetch
-        // each student's progress via where: { member_id: { equals: id } }.
-        const idsFromApi = new Set(studentMembers.map((m) => m.id));
-        const extraIds = allStudents
-          .map((s) => s.memberId)
-          .filter((id) => id && !idsFromApi.has(id));
-        const allIds = Array.from(idsFromApi).concat(extraIds);
-
-        const progressByStudent = await Promise.all(
-          allIds.map((id) => getProgressByMemberId(id)),
-        );
-        if (cancelled) return;
-
-        setTeacherMembers(studentMembers);
-        setRegistry(allStudents);
+        setStudents(allStudents);
         setQuestions(allQuestions);
-        setProgress(progressByStudent.flat());
+        setPendingKaiako(pendingProfiles);
         setDataLoading(false);
       } catch (err) {
         console.error(err);
@@ -139,74 +118,8 @@ export default function TeacherDashboardView({ levels }: Props) {
     }
 
     run();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
-
-  const students = useMemo<StudentSummary[]>(() => {
-    const byMember = new Map<string, StudentSummary>();
-
-    // Primary identity source: admin API member list.
-    for (const m of teacherMembers) {
-      byMember.set(m.id, {
-        memberId: m.id,
-        name: memberFullName(m),
-        email: m.email,
-        completedByLevel: {},
-        lastActivity: "",
-      });
-    }
-
-    // Fallback identity: student_registry entries for members the admin API
-    // didn't return (e.g. if the route is down).
-    for (const s of registry) {
-      if (!s.memberId || byMember.has(s.memberId)) continue;
-      byMember.set(s.memberId, {
-        memberId: s.memberId,
-        name: fullName(s),
-        email: s.email,
-        completedByLevel: {},
-        lastActivity: s.createdAt,
-      });
-    }
-
-    // Edge case: students who asked a question but aren't in either source yet.
-    for (const q of questions) {
-      if (!q.studentId || byMember.has(q.studentId)) continue;
-      byMember.set(q.studentId, {
-        memberId: q.studentId,
-        name: q.studentName || q.studentId,
-        email: q.studentEmail,
-        completedByLevel: {},
-        lastActivity: q.createdAt,
-      });
-    }
-
-    // Fold in lesson progress counts.
-    for (const p of progress) {
-      if (!p.memberId) continue;
-      const existing = byMember.get(p.memberId) ?? {
-        memberId: p.memberId,
-        name: p.memberId,
-        email: "",
-        completedByLevel: {},
-        lastActivity: p.createdAt,
-      };
-      if (p.completed && p.levelSlug) {
-        existing.completedByLevel[p.levelSlug] =
-          (existing.completedByLevel[p.levelSlug] ?? 0) + 1;
-      }
-      if (p.createdAt && p.createdAt > existing.lastActivity) {
-        existing.lastActivity = p.createdAt;
-      }
-      byMember.set(p.memberId, existing);
-    }
-
-    return Array.from(byMember.values()).sort((a, b) =>
-      b.lastActivity.localeCompare(a.lastActivity),
-    );
-  }, [teacherMembers, registry, progress, questions]);
 
   const unansweredQuestions = useMemo(
     () => questions.filter((q) => !q.answered),
@@ -228,6 +141,10 @@ export default function TeacherDashboardView({ levels }: Props) {
     );
   }
 
+  function handleKaiakoActioned(profileId: string) {
+    setPendingKaiako((prev) => prev.filter((p) => p.id !== profileId));
+  }
+
   if (authLoading) {
     return (
       <div className="min-h-[calc(100vh-6rem)] bg-midnight-tidal flex items-center justify-center">
@@ -241,9 +158,7 @@ export default function TeacherDashboardView({ levels }: Props) {
       <div className="min-h-[calc(100vh-6rem)] bg-midnight-tidal flex items-center justify-center px-6">
         <div className="max-w-md text-center">
           <ShieldAlert size={36} className="text-semantic-yellow mx-auto mb-4" />
-          <h1 className="font-display text-3xl text-white mb-2">
-            redirecting…
-          </h1>
+          <h1 className="font-display text-3xl text-white mb-2">redirecting…</h1>
           <p className="font-sans text-white/60">
             The kaiako dashboard is for teachers only.
           </p>
@@ -257,6 +172,7 @@ export default function TeacherDashboardView({ levels }: Props) {
   return (
     <div className="min-h-[calc(100vh-6rem)] bg-midnight-tidal">
       <section className="site-container py-16 md:py-20">
+        {/* Hero */}
         <div className="rounded-2xl bg-primary shadow-xl shadow-primary/20 px-7 py-8 md:px-10 md:py-10">
           <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
             Kaiako dashboard
@@ -273,8 +189,27 @@ export default function TeacherDashboardView({ levels }: Props) {
               <MessageSquare size={14} />
               {unansweredQuestions.length} unanswered · {answeredCount} answered
             </span>
+            {pendingKaiako.length > 0 && (
+              <span className="inline-flex items-center gap-2 text-semantic-yellow">
+                <UserCheck size={14} />
+                {pendingKaiako.length} kaiako request
+                {pendingKaiako.length === 1 ? "" : "s"} pending
+              </span>
+            )}
           </div>
         </div>
+
+        {/* Pending kaiako requests */}
+        {(dataLoading || pendingKaiako.length > 0) && (
+          <div className="mt-8">
+            <PendingKaiakoSection
+              requests={pendingKaiako}
+              loading={dataLoading}
+              callerId={member?.id ?? ""}
+              onActioned={handleKaiakoActioned}
+            />
+          </div>
+        )}
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <InboxSection
@@ -284,11 +219,10 @@ export default function TeacherDashboardView({ levels }: Props) {
             loading={dataLoading}
             levelNameBySlug={(slug) => levelBySlug[slug]?.name ?? slug}
           />
-
           <StudentsSection
             students={students}
             loading={dataLoading}
-            levels={levels}
+            levelBySlug={levelBySlug}
           />
         </div>
       </section>
@@ -299,11 +233,11 @@ export default function TeacherDashboardView({ levels }: Props) {
 function StudentsSection({
   students,
   loading,
-  levels,
+  levelBySlug,
 }: {
-  students: StudentSummary[];
+  students: ChildProfile[];
   loading: boolean;
-  levels: Level[];
+  levelBySlug: Record<string, Level>;
 }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-iron-depth p-7 md:p-8">
@@ -318,77 +252,211 @@ function StudentsSection({
         </div>
       ) : students.length === 0 ? (
         <p className="font-sans text-sm text-white/50 leading-relaxed">
-          No student activity yet. Students will appear here once they mark
-          lessons complete or ask questions.
+          No enrolled students yet. Students will appear here once a parent
+          completes enrolment.
         </p>
       ) : (
         <ul className="divide-y divide-white/10">
-          {students.map((s) => {
-            const totalCompleted = Object.values(s.completedByLevel).reduce(
-              (sum, n) => sum + n,
-              0,
-            );
-            const levelCount = Object.keys(s.completedByLevel).length;
-
-            return (
-              <li key={s.memberId} className="py-4">
-                <p className="font-sans text-base text-white truncate">
-                  {s.name}
-                </p>
-                {s.email && (
-                  <p className="font-sans text-xs text-white/45 truncate">
-                    {s.email}
-                  </p>
-                )}
-
-                <p className="mt-2 font-sans text-xs text-white/55">
-                  {totalCompleted === 0
-                    ? "No lessons completed yet"
-                    : `${totalCompleted} lesson${totalCompleted === 1 ? "" : "s"} completed across ${levelCount} level${levelCount === 1 ? "" : "s"}`}
-                </p>
-
-                {totalCompleted > 0 && (
-                  <div className="mt-3 flex flex-col gap-2">
-                    {levels.map((level) => {
-                      const count = s.completedByLevel[level.slug] ?? 0;
-                      if (count === 0) return null;
-                      const thumbnail = level.thumbnail?.[0]?.url;
-                      return (
-                        <Link
-                          key={level.slug}
-                          href={`/dashboard/levels/${level.slug}`}
-                          className="group inline-flex items-center gap-3 rounded-lg p-2 -m-2 hover:bg-white/[0.04] transition-colors"
-                        >
-                          <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-iron-depth border border-white/10">
-                            {thumbnail && (
-                              <Image
-                                src={thumbnail}
-                                alt=""
-                                fill
-                                sizes="48px"
-                                className="object-contain"
-                              />
-                            )}
-                          </div>
-                          <span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/30 px-3 py-1 font-sans text-xs text-primary group-hover:bg-primary/20 transition-colors">
-                            {level.name} · {count} lesson
-                            {count === 1 ? "" : "s"}
-                          </span>
-                          <ChevronRight
-                            size={14}
-                            className="text-white/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all"
-                          />
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </li>
-            );
-          })}
+          {students.map((s) => (
+            <StudentCard key={s.id} student={s} levelBySlug={levelBySlug} />
+          ))}
         </ul>
       )}
     </div>
+  );
+}
+
+function StudentCard({
+  student,
+  levelBySlug,
+}: {
+  student: ChildProfile;
+  levelBySlug: Record<string, Level>;
+}) {
+  const level = levelBySlug[student.level];
+  const levelLabel = level?.name ?? LEVEL_LABELS[student.level] ?? student.level;
+  const age = ageInYears(student.dateOfBirth);
+
+  return (
+    <li className="py-4">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <p className="font-sans text-base font-medium text-white">
+            {studentFullName(student)}
+          </p>
+          {levelLabel && (
+            <span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/30 px-2.5 py-0.5 font-sans text-xs text-primary mt-1">
+              {levelLabel}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <ul className="mt-2 space-y-1">
+        {age !== null && (
+          <li className="inline-flex items-center gap-2 font-sans text-xs text-white/55">
+            <Cake size={12} className="text-white/40 shrink-0" />
+            {age} {age === 1 ? "year" : "years"} old
+          </li>
+        )}
+        {student.username && (
+          <li className="flex items-center gap-2 font-sans text-xs text-white/55">
+            <AtSign size={12} className="text-white/40 shrink-0" />
+            {student.username}
+          </li>
+        )}
+      </ul>
+
+      {student.medicalNotes && (
+        <div className="mt-2 flex items-start gap-2 rounded-lg bg-semantic-yellow/10 border border-semantic-yellow/20 px-3 py-2">
+          <HeartPulse size={12} className="text-semantic-yellow mt-0.5 shrink-0" />
+          <p className="font-sans text-xs text-white/70 leading-snug">
+            {student.medicalNotes}
+          </p>
+        </div>
+      )}
+    </li>
+  );
+}
+
+function PendingKaiakoSection({
+  requests,
+  loading,
+  callerId,
+  onActioned,
+}: {
+  requests: KaiakoProfile[];
+  loading: boolean;
+  callerId: string;
+  onActioned: (profileId: string) => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-semantic-yellow/25 bg-iron-depth p-7 md:p-8">
+      <div className="flex items-center gap-3 mb-6">
+        <UserCheck size={20} className="text-semantic-yellow" />
+        <h2 className="font-display text-2xl text-white">kaiako requests</h2>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-6">
+          <Loader2 size={20} className="text-white/30 animate-spin" />
+        </div>
+      ) : requests.length === 0 ? (
+        <p className="font-sans text-sm text-white/50 leading-relaxed">
+          No pending requests.
+        </p>
+      ) : (
+        <ul className="space-y-4">
+          {requests.map((req) => (
+            <KaiakoRequestCard
+              key={req.id}
+              profile={req}
+              callerId={callerId}
+              onActioned={onActioned}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function KaiakoRequestCard({
+  profile,
+  callerId,
+  onActioned,
+}: {
+  profile: KaiakoProfile;
+  callerId: string;
+  onActioned: (profileId: string) => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState<"approved" | "denied" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleAction(action: "approve" | "deny") {
+    if (loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      if (action === "approve") {
+        const res = await fetch("/api/teacher/approve-kaiako", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-member-id": callerId,
+          },
+          body: JSON.stringify({ memberId: profile.memberId, action }),
+        });
+        if (!res.ok) {
+          const body = (await res.json().catch(() => null)) as { error?: string } | null;
+          throw new Error(body?.error ?? `Request failed (${res.status})`);
+        }
+      }
+      await updateKaiakoProfileStatus(profile.id, action === "approve" ? "approved" : "denied");
+      setDone(action === "approve" ? "approved" : "denied");
+      setTimeout(() => onActioned(profile.id), 800);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const name = kaiakoFullName(profile);
+
+  return (
+    <li className="rounded-xl border border-white/10 bg-midnight-tidal p-5">
+      <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
+        <div>
+          <p className="font-sans text-sm font-semibold text-white">{name || "Unknown"}</p>
+          {profile.email && (
+            <p className="font-sans text-xs text-white/45 mt-0.5">{profile.email}</p>
+          )}
+        </div>
+        {done && (
+          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-sans text-xs font-medium ${
+            done === "approved"
+              ? "bg-semantic-green/15 text-semantic-green"
+              : "bg-semantic-red/15 text-semantic-red"
+          }`}>
+            {done === "approved" ? <Check size={12} /> : <X size={12} />}
+            {done}
+          </span>
+        )}
+      </div>
+
+      {profile.experience && (
+        <p className="font-sans text-sm text-white/70 leading-relaxed mb-4 whitespace-pre-line">
+          {profile.experience}
+        </p>
+      )}
+
+      {error && (
+        <p className="font-sans text-xs text-semantic-red mb-3">{error}</p>
+      )}
+
+      {!done && (
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleAction("approve")}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 bg-semantic-green/15 border border-semantic-green/30 text-semantic-green font-sans text-sm font-medium hover:bg-semantic-green/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+            Approve
+          </button>
+          <button
+            onClick={() => handleAction("deny")}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 bg-white/5 border border-white/10 text-white/60 font-sans text-sm font-medium hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <X size={13} />
+            Deny
+          </button>
+        </div>
+      )}
+    </li>
   );
 }
 
@@ -409,9 +477,7 @@ function InboxSection({
     <div className="rounded-2xl border border-white/10 bg-iron-depth p-7 md:p-8">
       <div className="flex items-center gap-3 mb-6">
         <MessageSquare size={20} className="text-primary" />
-        <h2 className="font-display text-2xl text-white">
-          ask the kaiako inbox
-        </h2>
+        <h2 className="font-display text-2xl text-white">ask the kaiako inbox</h2>
       </div>
 
       {loading ? (
@@ -459,10 +525,7 @@ function QuestionCard({
     e.preventDefault();
     if (!reply.trim() || submitting) return;
     setSubmitting(true);
-    const result = await answerQuestion({
-      questionId: question.id,
-      answer: reply.trim(),
-    });
+    const result = await answerQuestion({ questionId: question.id, answer: reply.trim() });
     setSubmitting(false);
     if (result) {
       setDone(true);
@@ -510,11 +573,7 @@ function QuestionCard({
               disabled={submitting || !reply.trim()}
               className="inline-flex h-10 items-center gap-2 rounded-lg px-4 bg-primary text-white font-sans text-sm font-medium transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-primary-light hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:bg-primary"
             >
-              {submitting ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Send size={14} />
-              )}
+              {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
               {submitting ? "Sending…" : "Send reply"}
             </button>
           </div>
@@ -524,7 +583,6 @@ function QuestionCard({
   );
 }
 
-// Exported link helper kept for future use by the dashboard header.
 export function TeacherDashboardLink() {
   return (
     <Link

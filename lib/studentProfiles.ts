@@ -64,6 +64,25 @@ export function ageInYears(dob: string): number | null {
   return age >= 0 ? age : null;
 }
 
+export async function getAllStudentProfiles(): Promise<ChildProfile[]> {
+  const ms = getMemberstack();
+  if (!ms) return [];
+  try {
+    const { data } = await ms.queryDataRecords({
+      table: TABLE,
+      query: { orderBy: { createdAt: "asc" }, take: 100 },
+    });
+    if ("records" in data) {
+      return (data.records as RawRecord[])
+        .map((r) => parseChild(r))
+        .sort((a, b) => a.firstName.localeCompare(b.firstName));
+    }
+  } catch (err) {
+    console.error("getAllStudentProfiles failed", err);
+  }
+  return [];
+}
+
 export async function getChildrenForParent(
   parentMemberId: string,
 ): Promise<ChildProfile[]> {

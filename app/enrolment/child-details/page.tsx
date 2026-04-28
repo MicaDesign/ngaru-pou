@@ -185,7 +185,6 @@ function ChildDetailsForm() {
               date_of_birth: child.dob,
               level: child.level,
               username: child.username,
-              pin: child.pin,
               medical_notes: child.medical,
             },
           }),
