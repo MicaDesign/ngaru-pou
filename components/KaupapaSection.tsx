@@ -45,7 +45,7 @@ export default function KaupapaSection() {
             learning rooted in identity
           </h2>
           <p className="font-sans text-white/60 text-[1.2rem] leading-[1.5]">
-            Ngāru Pou is built on the belief that education should strengthen
+            Ngaru Pou is built on the belief that education should strengthen
             both knowledge and identity. By weaving together academic
             achievement, digital innovation, and te ao Māori values, we create
             a learning experience that grows confident, capable rangatahi —
