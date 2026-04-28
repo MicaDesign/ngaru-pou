@@ -79,7 +79,7 @@ export default function EngageSection() {
               <div
                 className={`card-airy flex h-full flex-col gap-5 p-12 ${i % 3 !== 0 ? "border-l border-white/[0.11]" : ""}`}
               >
-                <Image src={icon} alt="" width={40} height={40} className="opacity-90" />
+                <Image src={icon} alt="" width={80} height={80} />
                 <h3 className="font-sans font-semibold text-white text-[1.25rem] leading-[1.2]">
                   {heading}
                 </h3>
