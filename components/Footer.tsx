@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getMemberstack } from "@/lib/memberstack";
 
@@ -122,15 +122,19 @@ export default function Footer() {
 
           <div className="flex items-center gap-2">
             <Link
-              href="#"
-              aria-label="Visit Ngaru Pou on X"
+              href="https://www.facebook.com/groups/816360571780791"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visit Ngaru Pou on Facebook"
               className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2)] backdrop-blur-sm transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.11] hover:-translate-y-0.5"
             >
-              <Globe size={16} />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+              </svg>
             </Link>
             <Link
-              href="#"
-              aria-label="Contact Ngaru Pou"
+              href="mailto:info@ngarupou.org.au"
+              aria-label="Email Ngaru Pou"
               className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2)] backdrop-blur-sm transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:bg-white/[0.11] hover:-translate-y-0.5"
             >
               <Mail size={16} />
