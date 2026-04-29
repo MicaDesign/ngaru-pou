@@ -80,6 +80,11 @@ function getFirstName(member: Member): string {
   return email.split("@")[0] ?? "";
 }
 
+function getLastName(member: Member): string {
+  const v = member?.customFields?.["last-name"];
+  return typeof v === "string" ? v.trim() : "";
+}
+
 type TabId = "students" | "inbox" | "requests" | "eoi" | "settings";
 
 export default function TeacherDashboardView({ levels }: Props) {
@@ -104,6 +109,19 @@ export default function TeacherDashboardView({ levels }: Props) {
   }>({ visible: false, text: "", link: "", style: "info" });
   const [announcementSaving, setAnnouncementSaving] = useState(false);
   const [announcementSaved, setAnnouncementSaved] = useState(false);
+  // Profile editing
+  const [profileFirstName, setProfileFirstName] = useState("");
+  const [profileLastName, setProfileLastName] = useState("");
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  // Password change
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -130,6 +148,8 @@ export default function TeacherDashboardView({ levels }: Props) {
         }
 
         setMember(data);
+        setProfileFirstName(getFirstName(data));
+        setProfileLastName(getLastName(data));
         setAuthLoading(false);
 
         const [allStudents, allQuestions, pendingProfiles, siteSettings, eoiList, memberAvatar, studentAvatarMap] = await Promise.all([
@@ -195,6 +215,45 @@ export default function TeacherDashboardView({ levels }: Props) {
     setPendingKaiako((prev) => prev.filter((p) => p.id !== profileId));
   }
 
+  async function handleSaveProfile() {
+    if (profileSaving) return;
+    setProfileSaving(true);
+    setProfileError(null);
+    try {
+      const ms = getMemberstack();
+      if (!ms) throw new Error("Not signed in");
+      await ms.updateMember({ customFields: { "first-name": profileFirstName.trim(), "last-name": profileLastName.trim() } });
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 2500);
+    } catch (err: unknown) {
+      setProfileError((err as Record<string, string>)?.message ?? "Failed to save. Please try again.");
+    } finally {
+      setProfileSaving(false);
+    }
+  }
+
+  async function handleChangePassword() {
+    if (passwordSaving) return;
+    if (newPassword !== confirmPassword) { setPasswordError("New passwords don't match."); return; }
+    if (newPassword.length < 8) { setPasswordError("New password must be at least 8 characters."); return; }
+    setPasswordSaving(true);
+    setPasswordError(null);
+    try {
+      const ms = getMemberstack();
+      if (!ms) throw new Error("Not signed in");
+      await ms.updateMember({ auth: { password: currentPassword, newPassword } });
+      setPasswordSaved(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTimeout(() => setPasswordSaved(false), 3000);
+    } catch (err: unknown) {
+      setPasswordError((err as Record<string, string>)?.message ?? "Incorrect current password.");
+    } finally {
+      setPasswordSaving(false);
+    }
+  }
+
   async function handleSaveAnnouncement() {
     if (announcementSaving) return;
     setAnnouncementSaving(true);
@@ -257,25 +316,12 @@ export default function TeacherDashboardView({ levels }: Props) {
       <section className="site-container py-16 md:py-20">
         {/* Hero */}
         <div className="rounded-2xl bg-primary shadow-xl shadow-primary/20 px-7 py-8 md:px-10 md:py-10">
-          <div className="flex items-center gap-6">
-            {member?.id && (
-              <AvatarUpload
-                currentUrl={avatarUrl}
-                name={firstName || "Kaiako"}
-                size={72}
-                onUpload={(file) => uploadMemberAvatar(member.id!, file)}
-                onSaved={setAvatarUrl}
-              />
-            )}
-            <div>
-              <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
-                Kaiako dashboard
-              </p>
-              <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
-                kia ora{firstName ? `, ${firstName}` : ""} — kaiako dashboard
-              </h1>
-            </div>
-          </div>
+          <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
+            Kaiako dashboard
+          </p>
+          <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
+            kia ora{firstName ? `, ${firstName}` : ""}
+          </h1>
         </div>
 
         {/* Tab bar */}
@@ -346,6 +392,121 @@ export default function TeacherDashboardView({ levels }: Props) {
               <div className="flex items-center gap-3">
                 <Settings size={20} className="text-primary" />
                 <h2 className="font-display text-2xl text-white">settings</h2>
+              </div>
+
+              {/* Avatar */}
+              <div>
+                <p className="font-sans text-xs uppercase tracking-widest text-white/40 mb-3">Profile photo</p>
+                <div className="flex items-center gap-5 rounded-xl bg-midnight-tidal border border-white/10 px-5 py-4">
+                  {member?.id && (
+                    <AvatarUpload
+                      currentUrl={avatarUrl}
+                      name={profileFirstName || "Kaiako"}
+                      size={64}
+                      onUpload={(file) => uploadMemberAvatar(member.id!, file)}
+                      onSaved={setAvatarUrl}
+                    />
+                  )}
+                  <p className="font-sans text-xs text-white/45">Click the photo to upload a new one.</p>
+                </div>
+              </div>
+
+              {/* Name */}
+              <div>
+                <p className="font-sans text-xs uppercase tracking-widest text-white/40 mb-3">Name</p>
+                <div className="rounded-xl bg-midnight-tidal border border-white/10 px-5 py-4 flex flex-col gap-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-sans text-xs text-white/40 uppercase tracking-widest">First name</label>
+                      <input
+                        type="text"
+                        value={profileFirstName}
+                        onChange={(e) => setProfileFirstName(e.target.value)}
+                        placeholder="First name"
+                        className="w-full bg-iron-depth border border-white/10 rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Last name</label>
+                      <input
+                        type="text"
+                        value={profileLastName}
+                        onChange={(e) => setProfileLastName(e.target.value)}
+                        placeholder="Last name"
+                        className="w-full bg-iron-depth border border-white/10 rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
+                      />
+                    </div>
+                  </div>
+                  {profileError && <p className="font-sans text-xs text-semantic-red">{profileError}</p>}
+                  <div className="flex items-center justify-end gap-3">
+                    {profileSaved && (
+                      <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
+                        <Check size={12} /> Saved
+                      </span>
+                    )}
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={profileSaving}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-sans text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {profileSaving ? <Loader2 size={13} className="animate-spin" /> : null}
+                      {profileSaving ? "Saving…" : "Save name"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <p className="font-sans text-xs uppercase tracking-widest text-white/40 mb-3">Change password</p>
+                <div className="rounded-xl bg-midnight-tidal border border-white/10 px-5 py-4 flex flex-col gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Current password</label>
+                    <input
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-iron-depth border border-white/10 rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-sans text-xs text-white/40 uppercase tracking-widest">New password</label>
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-iron-depth border border-white/10 rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Confirm new password</label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-iron-depth border border-white/10 rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                  {passwordError && <p className="font-sans text-xs text-semantic-red">{passwordError}</p>}
+                  <div className="flex items-center justify-end gap-3">
+                    {passwordSaved && (
+                      <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
+                        <Check size={12} /> Password updated
+                      </span>
+                    )}
+                    <button
+                      onClick={handleChangePassword}
+                      disabled={passwordSaving || !currentPassword || !newPassword || !confirmPassword}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-sans text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {passwordSaving ? <Loader2 size={13} className="animate-spin" /> : null}
+                      {passwordSaving ? "Updating…" : "Update password"}
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Enrollment toggle */}
