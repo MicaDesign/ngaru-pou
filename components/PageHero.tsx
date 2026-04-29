@@ -14,7 +14,7 @@ export default function PageHero({ eyebrow, heading, body }: PageHeroProps) {
       {/* Pattern sits on top at low opacity so it subtly textures the gradient */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[url('/images/bg-pattern-1.svg')] bg-cover bg-center bg-no-repeat opacity-[0.12]"
+        className="pointer-events-none absolute inset-0 bg-[url('/images/bg-pattern-1.svg')] bg-cover bg-center bg-no-repeat opacity-[0.03]"
       />
       {/* Subtle dark scrim so white text stays readable */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
