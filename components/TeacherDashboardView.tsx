@@ -399,13 +399,14 @@ export default function TeacherDashboardView({ levels }: Props) {
                 <h2 className="font-display text-2xl text-midnight-tidal">settings</h2>
               </div>
 
-              {/* Profile photo + Name — side by side */}
+              {/* Profile, Name & Password — three columns */}
               <div>
-                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Profile &amp; name</p>
-                <div className="rounded-xl bg-white border border-midnight-tidal/25 px-5 py-5 flex flex-col md:flex-row gap-6 items-start">
-                  {/* Avatar column */}
+                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Profile &amp; account</p>
+                <div className="rounded-xl bg-white border border-midnight-tidal/25 px-6 py-6 flex flex-col lg:flex-row gap-0 divide-y lg:divide-y-0 lg:divide-x divide-midnight-tidal/10">
+
+                  {/* Col 1 — Avatar */}
                   {member?.id && (
-                    <div className="shrink-0 flex flex-col items-center md:items-start">
+                    <div className="shrink-0 flex flex-col items-center pb-6 lg:pb-0 lg:pr-6">
                       <AvatarUpload
                         currentUrl={avatarUrl}
                         name={profileFirstName || "Kaiako"}
@@ -416,8 +417,9 @@ export default function TeacherDashboardView({ levels }: Props) {
                     </div>
                   )}
 
-                  {/* Name fields column — takes remaining width */}
-                  <div className="flex flex-col gap-3 flex-1 w-full">
+                  {/* Col 2 — Name */}
+                  <div className="flex flex-col gap-3 flex-1 pt-6 lg:pt-0 lg:px-6">
+                    <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/55">Name</p>
                     <div className="flex flex-col gap-1.5">
                       <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">First name</label>
                       <input
@@ -439,7 +441,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       />
                     </div>
                     {profileError && <p className="font-sans text-xs text-semantic-red">{profileError}</p>}
-                    <div className="flex items-center justify-end gap-3 mt-1">
+                    <div className="flex items-center justify-end gap-3 mt-auto pt-2">
                       {profileSaved && (
                         <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
                           <Check size={12} /> Saved
@@ -455,59 +457,58 @@ export default function TeacherDashboardView({ levels }: Props) {
                       </button>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Password */}
-              <div>
-                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Change password</p>
-                <div className="rounded-xl bg-white border border-midnight-tidal/25 px-5 py-4 flex flex-col gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Current password</label>
-                    <input
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
-                    />
+                  {/* Col 3 — Password */}
+                  <div className="flex flex-col gap-3 flex-1 pt-6 lg:pt-0 lg:pl-6">
+                    <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/55">Change password</p>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Current password</label>
+                      <input
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">New password</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Confirm new password</label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                      />
+                    </div>
+                    {passwordError && <p className="font-sans text-xs text-semantic-red">{passwordError}</p>}
+                    <div className="flex items-center justify-end gap-3 mt-auto pt-2">
+                      {passwordSaved && (
+                        <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
+                          <Check size={12} /> Password updated
+                        </span>
+                      )}
+                      <button
+                        onClick={handleChangePassword}
+                        disabled={passwordSaving || !currentPassword || !newPassword || !confirmPassword}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-sans text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {passwordSaving ? <Loader2 size={13} className="animate-spin" /> : null}
+                        {passwordSaving ? "Updating…" : "Update password"}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">New password</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Confirm new password</label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
-                    />
-                  </div>
-                  {passwordError && <p className="font-sans text-xs text-semantic-red">{passwordError}</p>}
-                  <div className="flex items-center justify-end gap-3">
-                    {passwordSaved && (
-                      <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
-                        <Check size={12} /> Password updated
-                      </span>
-                    )}
-                    <button
-                      onClick={handleChangePassword}
-                      disabled={passwordSaving || !currentPassword || !newPassword || !confirmPassword}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-sans text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {passwordSaving ? <Loader2 size={13} className="animate-spin" /> : null}
-                      {passwordSaving ? "Updating…" : "Update password"}
-                    </button>
-                  </div>
+
                 </div>
               </div>
 
