@@ -16,7 +16,7 @@ export default function IdentitySection() {
       />
       <div className="site-container relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[2rem] items-center justify-between">
-          <FadeUp className="flex flex-col gap-8">
+          <FadeUp direction="left" className="flex flex-col gap-8">
             <div>
               <div className="inline-block border-t border-primary pt-2 mb-4">
                 <p className="font-sans text-primary text-base font-medium uppercase tracking-[0.15em]">
@@ -48,7 +48,7 @@ export default function IdentitySection() {
             </div>
           </FadeUp>
 
-          <FadeUp delay={0.15}>
+          <FadeUp delay={0.15} direction="right">
             <div className="media-frame w-full aspect-square">
               <Image
                 src="/images/3-moari-girls.avif"

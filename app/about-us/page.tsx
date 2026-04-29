@@ -71,7 +71,7 @@ export default function AboutUsPage() {
       <section className="section-md">
         <div className="site-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <FadeUp>
+            <FadeUp direction="left">
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                 <Image
                   src="/images/maori-kapa-haka-group.avif"
@@ -82,7 +82,7 @@ export default function AboutUsPage() {
                 />
               </div>
             </FadeUp>
-            <FadeUp delay={0.1}>
+            <FadeUp delay={0.1} direction="right">
               <div className="inline-block border-t border-primary pt-2 mb-4">
                 <p className="font-sans text-primary text-base font-medium uppercase tracking-[0.15em]">
                   Who We Are
@@ -185,7 +185,7 @@ export default function AboutUsPage() {
       <section className="section-md border-t border-white/[0.11]">
         <div className="site-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <FadeUp delay={0.1} className="order-2 lg:order-1">
+            <FadeUp delay={0.1} direction="left" className="order-2 lg:order-1">
               <div className="inline-block border-t border-primary pt-2 mb-4">
                 <p className="font-sans text-primary text-base font-medium uppercase tracking-[0.15em]">
                   Our Community
@@ -233,7 +233,7 @@ export default function AboutUsPage() {
                 </a>
               </div>
             </FadeUp>
-            <FadeUp className="order-1 lg:order-2">
+            <FadeUp direction="right" className="order-1 lg:order-2">
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                 <Image
                   src="/images/3-moari-girls.avif"

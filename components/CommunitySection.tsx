@@ -6,7 +6,7 @@ export default function CommunitySection() {
     <section className="section-md overflow-hidden bg-primary">
       <div className="site-container">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,5.5fr)_minmax(0,5fr)] lg:gap-[2rem] items-start">
-          <FadeUp delay={0.1} className="order-2 lg:order-1">
+          <FadeUp delay={0.1} direction="left" className="order-2 lg:order-1">
             <div className="media-frame w-full aspect-[3/4] max-w-[520px] lg:max-w-[540px] self-start">
               <Image
                 src="/images/maori-kapa-haka-group.avif"
@@ -18,7 +18,7 @@ export default function CommunitySection() {
             </div>
           </FadeUp>
 
-          <FadeUp className="flex flex-col gap-6 order-1 lg:order-2 self-start">
+          <FadeUp direction="right" className="flex flex-col gap-6 order-1 lg:order-2 self-start">
             <h2 className="section-h2 font-display text-white">
               supporting tamariki to succeed in school
             </h2>
