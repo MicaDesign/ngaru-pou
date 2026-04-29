@@ -412,7 +412,6 @@ export default function TeacherDashboardView({ levels }: Props) {
                       onSaved={setAvatarUrl}
                     />
                   )}
-                  <p className="font-sans text-xs text-midnight-tidal/60">Click the photo to upload a new one.</p>
                 </div>
               </div>
 
@@ -428,7 +427,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                         value={profileFirstName}
                         onChange={(e) => setProfileFirstName(e.target.value)}
                         placeholder="First name"
-                        className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -438,7 +437,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                         value={profileLastName}
                         onChange={(e) => setProfileLastName(e.target.value)}
                         placeholder="Last name"
-                        className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
                       />
                     </div>
                   </div>
@@ -472,7 +471,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -482,7 +481,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -492,7 +491,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
                     />
                   </div>
                   {passwordError && <p className="font-sans text-xs text-semantic-red">{passwordError}</p>}
@@ -534,7 +533,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       enrollmentOpen ? "bg-semantic-green" : "bg-midnight-tidal/20"
                     }`}
                   >
-                    <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${enrollmentOpen ? "translate-x-5" : "translate-x-0"}`} />
+                    <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow-md ring-1 ring-midnight-tidal/10 transition-transform duration-200 ${enrollmentOpen ? "translate-x-5" : "translate-x-0"}`} />
                   </button>
                 </div>
               </div>
@@ -556,7 +555,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                         announcement.visible ? "bg-primary" : "bg-midnight-tidal/20"
                       }`}
                     >
-                      <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${announcement.visible ? "translate-x-5" : "translate-x-0"}`} />
+                      <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow-md ring-1 ring-midnight-tidal/10 transition-transform duration-200 ${announcement.visible ? "translate-x-5" : "translate-x-0"}`} />
                     </button>
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -566,17 +565,17 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={announcement.text}
                       onChange={(e) => setAnnouncement((a) => ({ ...a, text: e.target.value }))}
                       placeholder="e.g. Term 2 enrolments are now open!"
-                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Link <span className="normal-case text-midnight-tidal/30">(optional)</span></label>
+                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Link <span className="normal-case text-midnight-tidal/50">(optional)</span></label>
                     <input
                       type="text"
                       value={announcement.link}
                       onChange={(e) => setAnnouncement((a) => ({ ...a, link: e.target.value }))}
                       placeholder="/enrolment/welcome or https://…"
-                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -591,7 +590,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                               ? s === "info" ? "bg-primary/20 border-primary text-primary"
                                 : s === "success" ? "bg-semantic-green/20 border-semantic-green text-semantic-green"
                                 : "bg-semantic-yellow/20 border-semantic-yellow text-semantic-yellow"
-                              : "bg-midnight-tidal/5 border-midnight-tidal/25 text-midnight-tidal/55 hover:border-midnight-tidal/25"
+                              : "bg-midnight-tidal/8 border-midnight-tidal/30 text-midnight-tidal/60 hover:border-midnight-tidal/40"
                           }`}
                         >
                           {s === "info" ? "Teal" : s === "success" ? "Green" : "Yellow"}
@@ -964,7 +963,7 @@ function QuestionCard({
             onChange={(e) => setReply(e.target.value)}
             rows={3}
             placeholder="Kia ora — type your reply…"
-            className="w-full rounded-lg bg-white border border-midnight-tidal/25 px-4 py-3 font-sans text-midnight-tidal placeholder-midnight-tidal/30 focus:outline-none focus:border-primary transition-colors"
+            className="w-full rounded-lg bg-salt-mist border border-midnight-tidal/30 px-4 py-3 font-sans text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
           />
           <div className="flex justify-end">
             <button

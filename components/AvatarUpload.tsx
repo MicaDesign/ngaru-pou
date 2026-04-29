@@ -66,7 +66,7 @@ export default function AvatarUpload({ currentUrl, name, size = 80, onUpload, on
         onChange={handleFile}
       />
       {error && <p className="font-sans text-xs text-semantic-red">{error}</p>}
-      <p className="font-sans text-xs text-white/35">Click to change photo</p>
+      <p className="font-sans text-xs text-midnight-tidal/55">Click to change photo</p>
     </div>
   );
 }
