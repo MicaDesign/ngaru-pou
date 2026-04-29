@@ -9,8 +9,13 @@ interface PageHeroProps {
 export default function PageHero({ eyebrow, heading, body }: PageHeroProps) {
   return (
     <section className="relative overflow-hidden border-b border-white/[0.11] py-24 md:py-36">
-      {/* Full-strength teal gradient */}
-      <div className="absolute inset-0 bg-hero-webflow" />
+      {/* Base pattern */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[url('/images/bg-pattern-1.svg')] bg-cover bg-center bg-no-repeat"
+      />
+      {/* Teal gradient at 90% opacity, sitting over the pattern */}
+      <div className="absolute inset-0 bg-hero-webflow opacity-90" />
       {/* Subtle dark scrim so white text stays readable */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
 
