@@ -45,6 +45,12 @@ export default function Footer() {
     }).catch(() => {});
   }, []);
 
+  async function handleLogout() {
+    const ms = getMemberstack();
+    if (ms) await ms.logout();
+    window.location.href = "/";
+  }
+
   return (
     <footer className="border-t border-white/[0.11] bg-midnight-tidal pt-16 pb-8">
       <div className="site-container">
@@ -60,28 +66,41 @@ export default function Footer() {
               height={64}
             />
           </Link>
-          {footerColumns.map((col, i) => (
-            <ul key={i} className="flex flex-col gap-1 items-start">
-              {col.filter(({ href }) => !MEMBER_ONLY_HREFS.has(href) || isLoggedIn).map(({ label, href }) => {
-                const isActive = pathname === href;
-                return (
-                  <li key={label}>
-                    <Link
-                      href={href}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`font-sans text-[1.1rem] px-[10px] py-[5px] rounded-full inline-block transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${
-                        isActive
-                          ? "bg-primary text-white"
-                          : "text-white hover:text-primary"
-                      }`}
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          ))}
+          {footerColumns.map((col, i) => {
+            // Column index 1 = the Sign Up / Log In column — swap when logged in
+            if (i === 1 && isLoggedIn) {
+              return (
+                <ul key={i} className="flex flex-col gap-1 items-start">
+                  <li><Link href="/faq" className={`font-sans text-[1.1rem] px-[10px] py-[5px] rounded-full inline-block transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${pathname === "/faq" ? "bg-primary text-white" : "text-white hover:text-primary"}`}>F.A.Q.</Link></li>
+                  <li><Link href="/dashboard" className={`font-sans text-[1.1rem] px-[10px] py-[5px] rounded-full inline-block transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${pathname === "/dashboard" ? "bg-primary text-white" : "text-white hover:text-primary"}`}>Dashboard</Link></li>
+                  <li><Link href="/messages" className={`font-sans text-[1.1rem] px-[10px] py-[5px] rounded-full inline-block transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${pathname === "/messages" ? "bg-primary text-white" : "text-white hover:text-primary"}`}>Messages</Link></li>
+                  <li><button onClick={handleLogout} className="font-sans text-[1.1rem] px-[10px] py-[5px] rounded-full inline-block transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] text-white hover:text-primary">Log Out</button></li>
+                </ul>
+              );
+            }
+            return (
+              <ul key={i} className="flex flex-col gap-1 items-start">
+                {col.filter(({ href }) => !MEMBER_ONLY_HREFS.has(href) || isLoggedIn).map(({ label, href }) => {
+                  const isActive = pathname === href;
+                  return (
+                    <li key={label}>
+                      <Link
+                        href={href}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`font-sans text-[1.1rem] px-[10px] py-[5px] rounded-full inline-block transition-colors duration-300 ease-[cubic-bezier(.165,.84,.44,1)] ${
+                          isActive
+                            ? "bg-primary text-white"
+                            : "text-white hover:text-primary"
+                        }`}
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })}
         </div>
 
         <div className="h-px bg-white/[0.11] my-6" />

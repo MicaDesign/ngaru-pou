@@ -177,18 +177,11 @@ export default function Nav() {
       >
         Dashboard
       </Link>
-      <Link
-        href="/messages"
-        className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300"
-        onClick={() => setOpen(false)}
-      >
-        Messages
-      </Link>
       <button
         onClick={handleLogout}
-        className="text-white/40 hover:text-white text-sm font-sans transition-colors text-left"
+        className="bg-primary hover:bg-primary-light text-white text-base font-semibold px-5 py-3 rounded-lg text-center transition-all duration-300"
       >
-        Log out
+        Log Out
       </button>
     </>
   ) : (
