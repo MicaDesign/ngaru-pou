@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Users, Heart, Globe2, Sparkles } from "lucide-react";
 import FadeUp from "@/components/FadeUp";
+import PageHero from "@/components/PageHero";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -44,28 +45,11 @@ const milestones = [
 export default function AboutUsPage() {
   return (
     <div className="bg-midnight-tidal">
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-white/[0.11] py-24 md:py-32">
-        <div className="absolute inset-0 bg-hero-webflow opacity-60" />
-        <div className="site-container relative z-10 text-center">
-          <FadeUp>
-            <div className="inline-block border-t border-primary pt-2 mb-4">
-              <p className="font-sans text-primary text-base font-medium uppercase tracking-[0.15em]">
-                About Us
-              </p>
-            </div>
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl text-white leading-none mb-6">
-              grounded in culture.<br />built for rangatahi.
-            </h1>
-            <p className="mx-auto max-w-2xl font-sans text-white/65 text-[1.15rem] leading-[1.6]">
-              Ngaru Pou Cultural Arts Inc. is a community organisation dedicated
-              to the educational, cultural, and personal development of Māori
-              students. We exist because we believe every rangatahi deserves
-              learning that sees them fully — and lifts them higher.
-            </p>
-          </FadeUp>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="About Us"
+        heading={<>grounded in culture.<br />built for rangatahi.</>}
+        body="Ngaru Pou Cultural Arts Inc. is a community organisation dedicated to the educational, cultural, and personal development of Māori students. We exist because we believe every rangatahi deserves learning that sees them fully — and lifts them higher."
+      />
 
       {/* Who We Are */}
       <section className="section-md">

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import FadeUp from "@/components/FadeUp";
+import PageHero from "@/components/PageHero";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -91,28 +92,11 @@ const whyPoints = [
 export default function HowItWorksPage() {
   return (
     <div className="bg-midnight-tidal">
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-white/[0.11] py-24 md:py-32">
-        <div className="absolute inset-0 bg-hero-webflow opacity-60" />
-        <div className="site-container relative z-10 text-center">
-          <FadeUp>
-            <div className="inline-block border-t border-primary pt-2 mb-4">
-              <p className="font-sans text-primary text-base font-medium uppercase tracking-[0.15em]">
-                How It Works
-              </p>
-            </div>
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl text-white leading-none mb-6">
-              simple steps, meaningful learning
-            </h1>
-            <p className="mx-auto max-w-2xl font-sans text-white/65 text-[1.15rem] leading-[1.6]">
-              Getting started with Ngaru Pou is straightforward. From your first
-              sign-up to your tamariki working through lessons, every step is
-              designed to be clear, welcoming, and easy to navigate — so you can
-              focus on what matters most.
-            </p>
-          </FadeUp>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="How It Works"
+        heading="simple steps, meaningful learning"
+        body="Getting started with Ngaru Pou is straightforward. From your first sign-up to your tamariki working through lessons, every step is designed to be clear, welcoming, and easy to navigate — so you can focus on what matters most."
+      />
 
       {/* Steps */}
       <section className="section-md">
