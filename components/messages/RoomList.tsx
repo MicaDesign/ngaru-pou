@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MessageSquare, Search, Plus } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import type { Room } from "@/lib/messaging/rooms";
 import type { FsUser } from "@/lib/messaging/users";
 import Avatar from "@/components/Avatar";
@@ -63,6 +63,11 @@ export default function RoomList({
     const isActive = room.id === activeRoomId;
     const preview = room.lastMessage ?? "";
 
+    // For DMs, find the other person's avatar from allUsers
+    const otherId = room.type === "dm" ? room.memberIds.find((id) => id !== me.id) : null;
+    const otherUser = otherId ? allUsers.find((u) => u.id === otherId) : null;
+    const dmAvatarUrl = otherUser?.avatarUrl ?? null;
+
     return (
       <button
         key={room.id}
@@ -77,9 +82,7 @@ export default function RoomList({
           {room.type === "group" ? (
             <Avatar src={room.avatarUrl} name={label} size={30} />
           ) : (
-            <div className="w-[30px] h-[30px] rounded-full bg-white/5 flex items-center justify-center shrink-0">
-              <MessageSquare size={13} className="text-white/40" />
-            </div>
+            <Avatar src={dmAvatarUrl} name={label} size={30} />
           )}
           <div className="min-w-0 flex-1">
             <p className="font-sans text-sm font-medium text-white truncate">{label}</p>

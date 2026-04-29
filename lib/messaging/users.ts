@@ -19,6 +19,7 @@ export type FsUser = {
   displayName: string;
   email: string;
   fcmTokens: string[];
+  avatarUrl?: string | null;
 };
 
 export async function upsertUser(user: {
