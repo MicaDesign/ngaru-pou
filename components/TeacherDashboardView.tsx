@@ -402,59 +402,57 @@ export default function TeacherDashboardView({ levels }: Props) {
               {/* Profile photo + Name — side by side */}
               <div>
                 <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Profile &amp; name</p>
-                <div className="rounded-xl bg-white border border-midnight-tidal/25 px-5 py-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-start">
-                    {/* Avatar */}
-                    {member?.id && (
-                      <div className="flex justify-center sm:justify-start">
-                        <AvatarUpload
-                          currentUrl={avatarUrl}
-                          name={profileFirstName || "Kaiako"}
-                          size={72}
-                          onUpload={(file) => uploadMemberAvatar(member.id!, file)}
-                          onSaved={setAvatarUrl}
-                        />
-                      </div>
-                    )}
+                <div className="rounded-xl bg-white border border-midnight-tidal/25 px-5 py-5 flex flex-col md:flex-row gap-6 items-start">
+                  {/* Avatar column */}
+                  {member?.id && (
+                    <div className="shrink-0 flex flex-col items-center md:items-start">
+                      <AvatarUpload
+                        currentUrl={avatarUrl}
+                        name={profileFirstName || "Kaiako"}
+                        size={80}
+                        onUpload={(file) => uploadMemberAvatar(member.id!, file)}
+                        onSaved={setAvatarUrl}
+                      />
+                    </div>
+                  )}
 
-                    {/* Name fields */}
-                    <div className="flex flex-col gap-3">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">First name</label>
-                        <input
-                          type="text"
-                          value={profileFirstName}
-                          onChange={(e) => setProfileFirstName(e.target.value)}
-                          placeholder="First name"
-                          className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Last name</label>
-                        <input
-                          type="text"
-                          value={profileLastName}
-                          onChange={(e) => setProfileLastName(e.target.value)}
-                          placeholder="Last name"
-                          className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
-                        />
-                      </div>
-                      {profileError && <p className="font-sans text-xs text-semantic-red">{profileError}</p>}
-                      <div className="flex items-center justify-end gap-3">
-                        {profileSaved && (
-                          <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
-                            <Check size={12} /> Saved
-                          </span>
-                        )}
-                        <button
-                          onClick={handleSaveProfile}
-                          disabled={profileSaving}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-sans text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {profileSaving ? <Loader2 size={13} className="animate-spin" /> : null}
-                          {profileSaving ? "Saving…" : "Save name"}
-                        </button>
-                      </div>
+                  {/* Name fields column — takes remaining width */}
+                  <div className="flex flex-col gap-3 flex-1 w-full">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">First name</label>
+                      <input
+                        type="text"
+                        value={profileFirstName}
+                        onChange={(e) => setProfileFirstName(e.target.value)}
+                        placeholder="First name"
+                        className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Last name</label>
+                      <input
+                        type="text"
+                        value={profileLastName}
+                        onChange={(e) => setProfileLastName(e.target.value)}
+                        placeholder="Last name"
+                        className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                      />
+                    </div>
+                    {profileError && <p className="font-sans text-xs text-semantic-red">{profileError}</p>}
+                    <div className="flex items-center justify-end gap-3 mt-1">
+                      {profileSaved && (
+                        <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
+                          <Check size={12} /> Saved
+                        </span>
+                      )}
+                      <button
+                        onClick={handleSaveProfile}
+                        disabled={profileSaving}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-sans text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {profileSaving ? <Loader2 size={13} className="animate-spin" /> : null}
+                        {profileSaving ? "Saving…" : "Save name"}
+                      </button>
                     </div>
                   </div>
                 </div>
