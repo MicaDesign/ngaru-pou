@@ -4,6 +4,7 @@
 
 :root {
   --ease-out-expo: cubic-bezier(.165, .84, .44, 1);
+  font-size: 18px;
 }
 
 @layer base {
