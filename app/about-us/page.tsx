@@ -109,16 +109,16 @@ export default function AboutUsPage() {
                 Our Mission
               </p>
             </div>
-            <h2 className="section-h2 font-display text-midnight-tidal mb-8">
+            <h2 className="section-h2 font-display text-primary mb-8">
               learning rooted in identity
             </h2>
-            <p className="font-sans text-midnight-tidal/70 text-[1.2rem] leading-[1.65] mb-6">
+            <p className="font-sans text-iron-depth text-[1.2rem] leading-[1.65] mb-6">
               Our mission is to provide high-quality, culturally grounded
               education that strengthens both academic achievement and Māori
               identity. We believe these two things are not in tension — they
               are inseparable.
             </p>
-            <p className="font-sans text-midnight-tidal/60 text-[1.1rem] leading-relaxed">
+            <p className="font-sans text-iron-depth/80 text-[1.1rem] leading-relaxed">
               Through Ngaru Pou, we create pathways where rangatahi can develop
               real-world skills — literacy, numeracy, critical thinking, and
               digital fluency — while deepening their understanding of
@@ -241,7 +241,7 @@ export default function AboutUsPage() {
                 Our Journey
               </p>
             </div>
-            <h2 className="section-h2 font-display text-midnight-tidal mb-4">
+            <h2 className="section-h2 font-display text-primary mb-4">
               how we got here
             </h2>
           </FadeUp>
@@ -260,7 +260,7 @@ export default function AboutUsPage() {
                   </div>
                   <div className="pb-2">
                     <p className="font-sans text-sm font-semibold text-primary mb-1">{m.year}</p>
-                    <p className="font-sans text-midnight-tidal/65 text-[1.05rem] leading-relaxed">{m.text}</p>
+                    <p className="font-sans text-iron-depth/85 text-[1.05rem] leading-relaxed">{m.text}</p>
                   </div>
                 </div>
               </FadeUp>

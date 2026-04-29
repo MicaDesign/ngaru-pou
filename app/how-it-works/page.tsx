@@ -102,10 +102,10 @@ export default function HowItWorksPage() {
       <section className="section-md bg-salt-mist">
         <div className="site-container">
           <FadeUp className="text-center mb-16">
-            <h2 className="section-h2 font-display text-midnight-tidal mb-4">
+            <h2 className="section-h2 font-display text-primary mb-4">
               getting started
             </h2>
-            <p className="font-sans text-midnight-tidal/60 text-[1.1rem] max-w-xl mx-auto leading-relaxed">
+            <p className="font-sans text-iron-depth/80 text-[1.1rem] max-w-xl mx-auto leading-relaxed">
               Here is everything you need to know to get your whānau up and
               running on the platform.
             </p>
@@ -116,15 +116,15 @@ export default function HowItWorksPage() {
               <FadeUp key={step.number} delay={i * 0.07}>
                 <div className="relative flex flex-col gap-5 rounded-2xl border border-midnight-tidal/[0.12] bg-white/70 p-8 h-full hover:bg-white transition-colors duration-300">
                   <div className="flex items-center gap-4">
-                    <span className="font-display text-5xl text-midnight-tidal/30 leading-none select-none">
+                    <span className="font-display text-5xl text-primary/40 leading-none select-none">
                       {step.number}
                     </span>
                     <Image src={step.icon} alt="" width={40} height={40} />
                   </div>
-                  <h3 className="font-sans text-[1.2rem] font-semibold text-midnight-tidal/75 leading-snug">
+                  <h3 className="font-sans text-[1.2rem] font-semibold text-primary leading-snug">
                     {step.title}
                   </h3>
-                  <p className="font-sans text-midnight-tidal/60 text-[1.05rem] leading-relaxed">
+                  <p className="font-sans text-iron-depth text-[1.05rem] leading-relaxed">
                     {step.body}
                   </p>
                 </div>
@@ -207,10 +207,10 @@ export default function HowItWorksPage() {
                   Why Ngaru Pou
                 </p>
               </div>
-              <h2 className="section-h2 font-display text-midnight-tidal mb-6">
+              <h2 className="section-h2 font-display text-primary mb-6">
                 designed for your whānau
               </h2>
-              <p className="font-sans text-midnight-tidal/65 text-[1.1rem] leading-relaxed mb-8">
+              <p className="font-sans text-iron-depth text-[1.1rem] leading-relaxed mb-8">
                 Ngaru Pou isn&apos;t just another online learning tool. It was
                 built specifically for Māori students and their whānau — with
                 culture, language, and identity woven into every lesson. Whether
@@ -219,7 +219,7 @@ export default function HowItWorksPage() {
               </p>
               <ul className="space-y-3 mb-10">
                 {whyPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-3 font-sans text-midnight-tidal/70 text-[1.05rem]">
+                  <li key={point} className="flex items-start gap-3 font-sans text-iron-depth text-[1.05rem]">
                     <CheckCircle size={18} className="text-primary mt-0.5 shrink-0" />
                     {point}
                   </li>
