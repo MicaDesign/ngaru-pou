@@ -676,40 +676,40 @@ function StudentCard({
   const age = ageInYears(student.dateOfBirth);
 
   return (
-    <li className="py-4">
-      <div className="flex items-start gap-3 flex-wrap">
-        <Avatar src={avatarUrl} name={studentFullName(student)} size={36} className="mt-0.5 shrink-0" />
+    <li className="py-5">
+      <div className="flex items-start gap-4 flex-wrap">
+        <Avatar src={avatarUrl} name={studentFullName(student)} size={48} className="mt-0.5 shrink-0" />
         <div className="flex-1">
-          <p className="font-sans text-base font-medium text-white">
+          <p className="font-sans text-lg font-medium text-white">
             {studentFullName(student)}
           </p>
           {levelLabel && (
-            <span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/30 px-2.5 py-0.5 font-sans text-xs text-primary mt-1">
+            <span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/30 px-3 py-1 font-sans text-sm text-primary mt-1.5">
               {levelLabel}
             </span>
           )}
         </div>
       </div>
 
-      <ul className="mt-2 space-y-1">
+      <ul className="mt-3 space-y-1.5">
         {age !== null && (
-          <li className="inline-flex items-center gap-2 font-sans text-xs text-white/55">
-            <Cake size={12} className="text-white/40 shrink-0" />
+          <li className="inline-flex items-center gap-2 font-sans text-sm text-white/55">
+            <Cake size={15} className="text-white/40 shrink-0" />
             {age} {age === 1 ? "year" : "years"} old
           </li>
         )}
         {student.username && (
-          <li className="flex items-center gap-2 font-sans text-xs text-white/55">
-            <AtSign size={12} className="text-white/40 shrink-0" />
+          <li className="flex items-center gap-2 font-sans text-sm text-white/55">
+            <AtSign size={15} className="text-white/40 shrink-0" />
             {student.username}
           </li>
         )}
       </ul>
 
       {student.medicalNotes && (
-        <div className="mt-2 flex items-start gap-2 rounded-lg bg-semantic-yellow/10 border border-semantic-yellow/20 px-3 py-2">
-          <HeartPulse size={12} className="text-semantic-yellow mt-0.5 shrink-0" />
-          <p className="font-sans text-xs text-white/70 leading-snug">
+        <div className="mt-3 flex items-start gap-2.5 rounded-lg bg-semantic-yellow/10 border border-semantic-yellow/20 px-4 py-3">
+          <HeartPulse size={15} className="text-semantic-yellow mt-0.5 shrink-0" />
+          <p className="font-sans text-sm text-white/70 leading-snug">
             {student.medicalNotes}
           </p>
         </div>

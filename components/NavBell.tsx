@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, MessageSquare, Users } from "lucide-react";
+import { MessageSquare, Users } from "lucide-react";
 import { subscribeToMyRooms, type Room } from "@/lib/messaging/rooms";
 import { getRoomReadTimes, markRoomRead } from "@/lib/messaging/readState";
 
@@ -84,7 +84,7 @@ export default function NavBell({ memberId }: Props) {
         aria-label="Notifications"
         className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/60 transition-colors duration-200 hover:border-white/30 hover:text-white"
       >
-        <Bell size={16} />
+        <MessageSquare size={16} />
         {unreadCount > 0 && (
           <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-semantic-red px-1 font-sans text-[10px] font-bold text-white ring-2 ring-midnight-tidal">
             {unreadCount > 9 ? "9+" : unreadCount}
