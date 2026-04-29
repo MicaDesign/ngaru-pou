@@ -47,7 +47,7 @@ export default function AvatarUpload({ currentUrl, name, size = 80, onUpload, on
         type="button"
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
-        className="relative group"
+        className="relative group rounded-full ring-2 ring-midnight-tidal/25 ring-offset-2 ring-offset-white"
         aria-label="Change avatar"
       >
         <Avatar src={displayed} name={name} size={size} />

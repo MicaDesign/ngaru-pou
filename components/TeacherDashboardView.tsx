@@ -427,7 +427,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                         value={profileFirstName}
                         onChange={(e) => setProfileFirstName(e.target.value)}
                         placeholder="First name"
-                        className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
+                        className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -437,7 +437,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                         value={profileLastName}
                         onChange={(e) => setProfileLastName(e.target.value)}
                         placeholder="Last name"
-                        className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
+                        className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
                       />
                     </div>
                   </div>
@@ -471,7 +471,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
+                      className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -481,7 +481,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
+                      className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -491,7 +491,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
+                      className="w-full bg-iron-depth border border-iron-depth rounded-lg px-3 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
                     />
                   </div>
                   {passwordError && <p className="font-sans text-xs text-semantic-red">{passwordError}</p>}
@@ -565,7 +565,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={announcement.text}
                       onChange={(e) => setAnnouncement((a) => ({ ...a, text: e.target.value }))}
                       placeholder="e.g. Term 2 enrolments are now open!"
-                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
+                      className="w-full bg-iron-depth border border-iron-depth rounded-lg px-4 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -575,7 +575,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                       value={announcement.link}
                       onChange={(e) => setAnnouncement((a) => ({ ...a, link: e.target.value }))}
                       placeholder="/enrolment/welcome or https://…"
-                      className="w-full bg-salt-mist border border-midnight-tidal/30 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
+                      className="w-full bg-iron-depth border border-iron-depth rounded-lg px-4 py-2.5 font-sans text-sm text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -963,7 +963,7 @@ function QuestionCard({
             onChange={(e) => setReply(e.target.value)}
             rows={3}
             placeholder="Kia ora — type your reply…"
-            className="w-full rounded-lg bg-salt-mist border border-midnight-tidal/30 px-4 py-3 font-sans text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/60 transition-colors"
+            className="w-full rounded-lg bg-iron-depth border border-iron-depth px-4 py-3 font-sans text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
           />
           <div className="flex justify-end">
             <button
