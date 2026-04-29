@@ -101,7 +101,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Mission */}
-      <section className="section-md border-t border-white/[0.11] bg-iron-depth/30">
+      <section className="section-md border-t border-midnight-tidal/[0.11] bg-salt-mist">
         <div className="site-container">
           <FadeUp className="max-w-3xl mx-auto text-center">
             <div className="inline-block border-t border-primary pt-2 mb-4">
@@ -109,16 +109,16 @@ export default function AboutUsPage() {
                 Our Mission
               </p>
             </div>
-            <h2 className="section-h2 font-display text-white mb-8">
+            <h2 className="section-h2 font-display text-midnight-tidal mb-8">
               learning rooted in identity
             </h2>
-            <p className="font-sans text-white/65 text-[1.2rem] leading-[1.65] mb-6">
+            <p className="font-sans text-midnight-tidal/70 text-[1.2rem] leading-[1.65] mb-6">
               Our mission is to provide high-quality, culturally grounded
               education that strengthens both academic achievement and Māori
               identity. We believe these two things are not in tension — they
               are inseparable.
             </p>
-            <p className="font-sans text-white/55 text-[1.1rem] leading-relaxed">
+            <p className="font-sans text-midnight-tidal/60 text-[1.1rem] leading-relaxed">
               Through Ngaru Pou, we create pathways where rangatahi can develop
               real-world skills — literacy, numeracy, critical thinking, and
               digital fluency — while deepening their understanding of
@@ -131,7 +131,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Values */}
-      <section className="section-md border-t border-white/[0.11]">
+      <section className="section-md border-t border-midnight-tidal/[0.15]">
         <div className="site-container">
           <FadeUp className="text-center mb-16">
             <div className="inline-block border-t border-primary pt-2 mb-4">
@@ -233,7 +233,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Timeline */}
-      <section className="section-md border-t border-white/[0.11] bg-iron-depth/30">
+      <section className="section-md border-t border-midnight-tidal/[0.11] bg-salt-mist">
         <div className="site-container">
           <FadeUp className="text-center mb-16">
             <div className="inline-block border-t border-primary pt-2 mb-4">
@@ -241,7 +241,7 @@ export default function AboutUsPage() {
                 Our Journey
               </p>
             </div>
-            <h2 className="section-h2 font-display text-white mb-4">
+            <h2 className="section-h2 font-display text-midnight-tidal mb-4">
               how we got here
             </h2>
           </FadeUp>
@@ -255,12 +255,12 @@ export default function AboutUsPage() {
                       <span className="font-sans text-[10px] font-bold text-primary">{m.year}</span>
                     </div>
                     {i < milestones.length - 1 && (
-                      <div className="mt-2 flex-1 w-px bg-white/10" />
+                      <div className="mt-2 flex-1 w-px bg-midnight-tidal/15" />
                     )}
                   </div>
                   <div className="pb-2">
                     <p className="font-sans text-sm font-semibold text-primary mb-1">{m.year}</p>
-                    <p className="font-sans text-white/65 text-[1.05rem] leading-relaxed">{m.text}</p>
+                    <p className="font-sans text-midnight-tidal/65 text-[1.05rem] leading-relaxed">{m.text}</p>
                   </div>
                 </div>
               </FadeUp>
