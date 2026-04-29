@@ -393,7 +393,7 @@ export default function TeacherDashboardView({ levels }: Props) {
             <EoiSection eois={eois} loading={dataLoading} />
           )}
           {activeTab === "settings" && (
-            <div className="rounded-2xl border border-midnight-tidal/15 bg-salt-mist p-7 md:p-8 flex flex-col gap-6">
+            <div className="rounded-2xl border border-midnight-tidal/25 bg-salt-mist p-7 md:p-8 flex flex-col gap-6">
               <div className="flex items-center gap-3">
                 <Settings size={20} className="text-primary" />
                 <h2 className="font-display text-2xl text-midnight-tidal">settings</h2>
@@ -401,8 +401,8 @@ export default function TeacherDashboardView({ levels }: Props) {
 
               {/* Avatar */}
               <div>
-                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/40 mb-3">Profile photo</p>
-                <div className="flex items-center gap-5 rounded-xl bg-white border border-midnight-tidal/15 px-5 py-4">
+                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Profile photo</p>
+                <div className="flex items-center gap-5 rounded-xl bg-white border border-midnight-tidal/25 px-5 py-4">
                   {member?.id && (
                     <AvatarUpload
                       currentUrl={avatarUrl}
@@ -412,33 +412,33 @@ export default function TeacherDashboardView({ levels }: Props) {
                       onSaved={setAvatarUrl}
                     />
                   )}
-                  <p className="font-sans text-xs text-midnight-tidal/45">Click the photo to upload a new one.</p>
+                  <p className="font-sans text-xs text-midnight-tidal/60">Click the photo to upload a new one.</p>
                 </div>
               </div>
 
               {/* Name */}
               <div>
-                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/40 mb-3">Name</p>
-                <div className="rounded-xl bg-white border border-midnight-tidal/15 px-5 py-4 flex flex-col gap-3">
+                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Name</p>
+                <div className="rounded-xl bg-white border border-midnight-tidal/25 px-5 py-4 flex flex-col gap-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1.5">
-                      <label className="font-sans text-xs text-midnight-tidal/40 uppercase tracking-widest">First name</label>
+                      <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">First name</label>
                       <input
                         type="text"
                         value={profileFirstName}
                         onChange={(e) => setProfileFirstName(e.target.value)}
                         placeholder="First name"
-                        className="w-full bg-white border border-midnight-tidal/15 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/25 focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="font-sans text-xs text-midnight-tidal/40 uppercase tracking-widest">Last name</label>
+                      <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Last name</label>
                       <input
                         type="text"
                         value={profileLastName}
                         onChange={(e) => setProfileLastName(e.target.value)}
                         placeholder="Last name"
-                        className="w-full bg-white border border-midnight-tidal/15 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/25 focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
                       />
                     </div>
                   </div>
@@ -463,36 +463,36 @@ export default function TeacherDashboardView({ levels }: Props) {
 
               {/* Password */}
               <div>
-                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/40 mb-3">Change password</p>
-                <div className="rounded-xl bg-white border border-midnight-tidal/15 px-5 py-4 flex flex-col gap-3">
+                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Change password</p>
+                <div className="rounded-xl bg-white border border-midnight-tidal/25 px-5 py-4 flex flex-col gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/40 uppercase tracking-widest">Current password</label>
+                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Current password</label>
                     <input
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-white border border-midnight-tidal/15 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/25 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/40 uppercase tracking-widest">New password</label>
+                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">New password</label>
                     <input
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-white border border-midnight-tidal/15 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/25 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/40 uppercase tracking-widest">Confirm new password</label>
+                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Confirm new password</label>
                     <input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-white border border-midnight-tidal/15 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/25 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-3 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
                     />
                   </div>
                   {passwordError && <p className="font-sans text-xs text-semantic-red">{passwordError}</p>}
@@ -516,11 +516,11 @@ export default function TeacherDashboardView({ levels }: Props) {
 
               {/* Enrollment toggle */}
               <div>
-                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/40 mb-3">Enrolments</p>
-                <div className="flex items-center justify-between gap-4 rounded-xl bg-white border border-midnight-tidal/15 px-5 py-4">
+                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Enrolments</p>
+                <div className="flex items-center justify-between gap-4 rounded-xl bg-white border border-midnight-tidal/25 px-5 py-4">
                   <div>
                     <p className="font-sans text-sm font-medium text-midnight-tidal">New enrolments open</p>
-                    <p className="font-sans text-xs text-midnight-tidal/50 mt-0.5">
+                    <p className="font-sans text-xs text-midnight-tidal/65 mt-0.5">
                       {enrollmentOpen
                         ? "Parents can sign up and enrol children."
                         : "Registrations closed — visitors see an expression of interest form."}
@@ -541,12 +541,12 @@ export default function TeacherDashboardView({ levels }: Props) {
 
               {/* Announcement banner */}
               <div>
-                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/40 mb-3">Site announcement</p>
-                <div className="rounded-xl bg-white border border-midnight-tidal/15 p-5 flex flex-col gap-4">
+                <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70 mb-3">Site announcement</p>
+                <div className="rounded-xl bg-white border border-midnight-tidal/25 p-5 flex flex-col gap-4">
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="font-sans text-sm font-medium text-midnight-tidal">Show announcement bar</p>
-                      <p className="font-sans text-xs text-midnight-tidal/50 mt-0.5">Displays a slim banner at the top of every page.</p>
+                      <p className="font-sans text-xs text-midnight-tidal/65 mt-0.5">Displays a slim banner at the top of every page.</p>
                     </div>
                     <button
                       onClick={() => setAnnouncement((a) => ({ ...a, visible: !a.visible }))}
@@ -560,27 +560,27 @@ export default function TeacherDashboardView({ levels }: Props) {
                     </button>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/40 uppercase tracking-widest">Message</label>
+                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Message</label>
                     <input
                       type="text"
                       value={announcement.text}
                       onChange={(e) => setAnnouncement((a) => ({ ...a, text: e.target.value }))}
                       placeholder="e.g. Term 2 enrolments are now open!"
-                      className="w-full bg-white border border-midnight-tidal/15 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/25 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/40 uppercase tracking-widest">Link <span className="normal-case text-midnight-tidal/30">(optional)</span></label>
+                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Link <span className="normal-case text-midnight-tidal/30">(optional)</span></label>
                     <input
                       type="text"
                       value={announcement.link}
                       onChange={(e) => setAnnouncement((a) => ({ ...a, link: e.target.value }))}
                       placeholder="/enrolment/welcome or https://…"
-                      className="w-full bg-white border border-midnight-tidal/15 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/25 focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-white border border-midnight-tidal/25 rounded-lg px-4 py-2.5 font-sans text-sm text-midnight-tidal placeholder-midnight-tidal/40 focus:outline-none focus:border-primary/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-xs text-midnight-tidal/40 uppercase tracking-widest">Colour</label>
+                    <label className="font-sans text-xs text-midnight-tidal/55 uppercase tracking-widest">Colour</label>
                     <div className="flex gap-2">
                       {(["info", "success", "warning"] as const).map((s) => (
                         <button
@@ -591,7 +591,7 @@ export default function TeacherDashboardView({ levels }: Props) {
                               ? s === "info" ? "bg-primary/20 border-primary text-primary"
                                 : s === "success" ? "bg-semantic-green/20 border-semantic-green text-semantic-green"
                                 : "bg-semantic-yellow/20 border-semantic-yellow text-semantic-yellow"
-                              : "bg-midnight-tidal/5 border-midnight-tidal/15 text-midnight-tidal/40 hover:border-midnight-tidal/25"
+                              : "bg-midnight-tidal/5 border-midnight-tidal/25 text-midnight-tidal/55 hover:border-midnight-tidal/25"
                           }`}
                         >
                           {s === "info" ? "Teal" : s === "success" ? "Green" : "Yellow"}
@@ -636,7 +636,7 @@ function StudentsSection({
   studentAvatars: Record<string, string>;
 }) {
   return (
-    <div className="rounded-2xl border border-midnight-tidal/15 bg-salt-mist p-7 md:p-8">
+    <div className="rounded-2xl border border-midnight-tidal/25 bg-salt-mist p-7 md:p-8">
       <div className="flex items-center gap-3 mb-6">
         <Users size={20} className="text-primary" />
         <h2 className="font-display text-2xl text-midnight-tidal">students</h2>
@@ -647,7 +647,7 @@ function StudentsSection({
           <Loader2 size={20} className="text-midnight-tidal/30 animate-spin" />
         </div>
       ) : students.length === 0 ? (
-        <p className="font-sans text-sm text-midnight-tidal/50 leading-relaxed">
+        <p className="font-sans text-sm text-midnight-tidal/65 leading-relaxed">
           No enrolled students yet. Students will appear here once a parent
           completes enrolment.
         </p>
@@ -693,23 +693,23 @@ function StudentCard({
 
       <ul className="mt-3 space-y-1.5">
         {age !== null && (
-          <li className="inline-flex items-center gap-2 font-sans text-sm text-midnight-tidal/60">
-            <Cake size={15} className="text-midnight-tidal/40 shrink-0" />
+          <li className="inline-flex items-center gap-2 font-sans text-sm text-midnight-tidal/70">
+            <Cake size={15} className="text-midnight-tidal/55 shrink-0" />
             {age} {age === 1 ? "year" : "years"} old
           </li>
         )}
         {student.username && (
-          <li className="flex items-center gap-2 font-sans text-sm text-midnight-tidal/60">
-            <AtSign size={15} className="text-midnight-tidal/40 shrink-0" />
+          <li className="flex items-center gap-2 font-sans text-sm text-midnight-tidal/70">
+            <AtSign size={15} className="text-midnight-tidal/55 shrink-0" />
             {student.username}
           </li>
         )}
       </ul>
 
       {student.medicalNotes && (
-        <div className="mt-3 flex items-start gap-2.5 rounded-lg bg-semantic-yellow/10 border border-semantic-yellow/20 px-4 py-3">
+        <div className="mt-3 flex items-start gap-2.5 rounded-lg bg-semantic-yellow/20 border border-semantic-yellow/40 px-4 py-3">
           <HeartPulse size={15} className="text-semantic-yellow mt-0.5 shrink-0" />
-          <p className="font-sans text-sm text-midnight-tidal/70 leading-snug">
+          <p className="font-sans text-sm text-midnight-tidal/80 leading-snug">
             {student.medicalNotes}
           </p>
         </div>
@@ -741,7 +741,7 @@ function PendingKaiakoSection({
           <Loader2 size={20} className="text-midnight-tidal/30 animate-spin" />
         </div>
       ) : requests.length === 0 ? (
-        <p className="font-sans text-sm text-midnight-tidal/50 leading-relaxed">
+        <p className="font-sans text-sm text-midnight-tidal/65 leading-relaxed">
           No pending requests.
         </p>
       ) : (
@@ -805,12 +805,12 @@ function KaiakoRequestCard({
   const name = kaiakoFullName(profile);
 
   return (
-    <li className="rounded-xl border border-midnight-tidal/15 bg-white p-5">
+    <li className="rounded-xl border border-midnight-tidal/25 bg-white p-5">
       <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
         <div>
           <p className="font-sans text-sm font-semibold text-midnight-tidal">{name || "Unknown"}</p>
           {profile.email && (
-            <p className="font-sans text-xs text-midnight-tidal/50 mt-0.5">{profile.email}</p>
+            <p className="font-sans text-xs text-midnight-tidal/65 mt-0.5">{profile.email}</p>
           )}
         </div>
         {done && (
@@ -848,7 +848,7 @@ function KaiakoRequestCard({
           <button
             onClick={() => handleAction("deny")}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 bg-midnight-tidal/5 border border-midnight-tidal/15 text-midnight-tidal/60 font-sans text-sm font-medium hover:bg-midnight-tidal/10 hover:text-midnight-tidal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 bg-midnight-tidal/5 border border-midnight-tidal/25 text-midnight-tidal/70 font-sans text-sm font-medium hover:bg-midnight-tidal/10 hover:text-midnight-tidal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <X size={13} />
             Deny
@@ -873,7 +873,7 @@ function InboxSection({
   levelNameBySlug: (slug: string) => string;
 }) {
   return (
-    <div className="rounded-2xl border border-midnight-tidal/15 bg-salt-mist p-7 md:p-8">
+    <div className="rounded-2xl border border-midnight-tidal/25 bg-salt-mist p-7 md:p-8">
       <div className="flex items-center gap-3 mb-6">
         <MessageSquare size={20} className="text-primary" />
         <h2 className="font-display text-2xl text-midnight-tidal">ask the kaiako inbox</h2>
@@ -885,7 +885,7 @@ function InboxSection({
         </div>
       ) : questions.length === 0 ? (
         <div className="py-6">
-          <p className="font-sans text-sm text-midnight-tidal/60">
+          <p className="font-sans text-sm text-midnight-tidal/70">
             {allQuestions.length === 0
               ? "No questions yet. Student questions will land here when they use the Ask the Kaiako form on a lesson."
               : "You're all caught up — no unanswered questions."}
@@ -935,12 +935,12 @@ function QuestionCard({
   const levelName = levelNameBySlug(question.levelSlug);
 
   return (
-    <li className="rounded-xl border border-midnight-tidal/15 bg-white p-5">
+    <li className="rounded-xl border border-midnight-tidal/25 bg-white p-5">
       <div className="flex items-baseline justify-between gap-3 flex-wrap mb-2">
         <p className="font-sans text-sm font-semibold text-midnight-tidal">
           {question.studentName || "Unknown student"}
         </p>
-        <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/40">
+        <p className="font-sans text-xs uppercase tracking-widest text-midnight-tidal/70">
           {levelName}
           {question.weekNumber ? ` · wk ${question.weekNumber}` : ""}
         </p>
@@ -956,7 +956,7 @@ function QuestionCard({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
-          <label className="block font-sans text-xs uppercase tracking-widest text-midnight-tidal/50">
+          <label className="block font-sans text-xs uppercase tracking-widest text-midnight-tidal/65">
             Your reply
           </label>
           <textarea
@@ -964,7 +964,7 @@ function QuestionCard({
             onChange={(e) => setReply(e.target.value)}
             rows={3}
             placeholder="Kia ora — type your reply…"
-            className="w-full rounded-lg bg-white border border-midnight-tidal/15 px-4 py-3 font-sans text-midnight-tidal placeholder-midnight-tidal/30 focus:outline-none focus:border-primary transition-colors"
+            className="w-full rounded-lg bg-white border border-midnight-tidal/25 px-4 py-3 font-sans text-midnight-tidal placeholder-midnight-tidal/30 focus:outline-none focus:border-primary transition-colors"
           />
           <div className="flex justify-end">
             <button
@@ -984,7 +984,7 @@ function QuestionCard({
 
 function EoiSection({ eois, loading }: { eois: EoiEntry[]; loading: boolean }) {
   return (
-    <div className="rounded-2xl border border-midnight-tidal/15 bg-salt-mist p-7 md:p-8">
+    <div className="rounded-2xl border border-midnight-tidal/25 bg-salt-mist p-7 md:p-8">
       <div className="flex items-center gap-3 mb-6">
         <MailOpen size={20} className="text-primary" />
         <h2 className="font-display text-2xl text-midnight-tidal">expressions of interest</h2>
@@ -1000,7 +1000,7 @@ function EoiSection({ eois, loading }: { eois: EoiEntry[]; loading: boolean }) {
           <Loader2 size={20} className="text-midnight-tidal/30 animate-spin" />
         </div>
       ) : eois.length === 0 ? (
-        <p className="font-sans text-sm text-midnight-tidal/50 leading-relaxed">
+        <p className="font-sans text-sm text-midnight-tidal/65 leading-relaxed">
           No expressions of interest yet. They appear here when enrolments are closed and parents fill in the interest form.
         </p>
       ) : (
@@ -1011,7 +1011,7 @@ function EoiSection({ eois, loading }: { eois: EoiEntry[]; loading: boolean }) {
                 <p className="font-sans text-sm font-medium text-midnight-tidal">
                   {e.firstName} {e.lastName}
                 </p>
-                <p className="font-sans text-xs text-midnight-tidal/40">
+                <p className="font-sans text-xs text-midnight-tidal/55">
                   {new Date(e.createdAt).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}
                 </p>
               </div>
@@ -1024,20 +1024,20 @@ function EoiSection({ eois, loading }: { eois: EoiEntry[]; loading: boolean }) {
                   {e.email}
                 </a>
                 {e.phone && (
-                  <span className="inline-flex items-center gap-1.5 font-sans text-xs text-midnight-tidal/50">
+                  <span className="inline-flex items-center gap-1.5 font-sans text-xs text-midnight-tidal/65">
                     <Phone size={11} />
                     {e.phone}
                   </span>
                 )}
                 {e.childrenCount && (
-                  <span className="inline-flex items-center gap-1.5 font-sans text-xs text-midnight-tidal/50">
+                  <span className="inline-flex items-center gap-1.5 font-sans text-xs text-midnight-tidal/65">
                     <Baby size={11} />
                     {e.childrenCount} {Number(e.childrenCount) === 1 ? "child" : "children"}
                   </span>
                 )}
               </div>
               {e.message && (
-                <p className="font-sans text-xs text-midnight-tidal/60 leading-snug mt-2 italic">
+                <p className="font-sans text-xs text-midnight-tidal/70 leading-snug mt-2 italic">
                   &ldquo;{e.message}&rdquo;
                 </p>
               )}
