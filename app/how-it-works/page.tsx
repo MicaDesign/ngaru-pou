@@ -116,12 +116,12 @@ export default function HowItWorksPage() {
               <FadeUp key={step.number} delay={i * 0.07}>
                 <div className="relative flex flex-col gap-5 rounded-2xl border border-midnight-tidal/[0.12] bg-white/70 p-8 h-full hover:bg-white transition-colors duration-300">
                   <div className="flex items-center gap-4">
-                    <span className="font-display text-5xl text-primary/30 leading-none select-none">
+                    <span className="font-display text-5xl text-midnight-tidal/30 leading-none select-none">
                       {step.number}
                     </span>
                     <Image src={step.icon} alt="" width={40} height={40} />
                   </div>
-                  <h3 className="font-sans text-[1.2rem] font-semibold text-midnight-tidal leading-snug">
+                  <h3 className="font-sans text-[1.2rem] font-semibold text-midnight-tidal/75 leading-snug">
                     {step.title}
                   </h3>
                   <p className="font-sans text-midnight-tidal/60 text-[1.05rem] leading-relaxed">
