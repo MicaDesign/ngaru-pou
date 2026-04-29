@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Loader2,
@@ -80,10 +80,13 @@ function getFirstName(member: Member): string {
   return email.split("@")[0] ?? "";
 }
 
+type TabId = "students" | "inbox" | "requests" | "eoi" | "settings";
+
 export default function TeacherDashboardView({ levels }: Props) {
   const [member, setMember] = useState<Member>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [denied, setDenied] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabId>("students");
   const [students, setStudents] = useState<ChildProfile[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [pendingKaiako, setPendingKaiako] = useState<KaiakoProfile[]>([]);
@@ -171,6 +174,7 @@ export default function TeacherDashboardView({ levels }: Props) {
     () => questions.filter((q) => !q.answered),
     [questions],
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const answeredCount = questions.length - unansweredQuestions.length;
 
   const levelBySlug = useMemo(() => {
@@ -240,6 +244,14 @@ export default function TeacherDashboardView({ levels }: Props) {
 
   const firstName = getFirstName(member);
 
+  const tabs: { id: TabId; label: string; icon: React.ReactNode; count?: number; countAlways?: boolean; alert?: boolean }[] = [
+    { id: "students", label: "Students", icon: <Users size={15} />, count: students.length, countAlways: true },
+    { id: "inbox", label: "Inbox", icon: <MessageSquare size={15} />, count: unansweredQuestions.length, countAlways: true },
+    { id: "requests", label: "Requests", icon: <UserCheck size={15} />, count: pendingKaiako.length, countAlways: false, alert: pendingKaiako.length > 0 },
+    { id: "eoi", label: "EOI", icon: <MailOpen size={15} />, count: eois.length, countAlways: false },
+    { id: "settings", label: "Settings", icon: <Settings size={15} /> },
+  ];
+
   return (
     <div className="min-h-[calc(100vh-6rem)] bg-midnight-tidal">
       <section className="site-container py-16 md:py-20">
@@ -262,178 +274,184 @@ export default function TeacherDashboardView({ levels }: Props) {
               <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
                 kia ora{firstName ? `, ${firstName}` : ""} — kaiako dashboard
               </h1>
-              <div className="mt-4 flex flex-wrap gap-5 text-sm font-sans text-white/85">
-                <span className="inline-flex items-center gap-2">
-                  <Users size={14} />
-                  {students.length} student{students.length === 1 ? "" : "s"}
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <MessageSquare size={14} />
-                  {unansweredQuestions.length} unanswered · {answeredCount} answered
-                </span>
-                {pendingKaiako.length > 0 && (
-                  <span className="inline-flex items-center gap-2 text-semantic-yellow">
-                    <UserCheck size={14} />
-                    {pendingKaiako.length} kaiako request
-                    {pendingKaiako.length === 1 ? "" : "s"} pending
-                  </span>
-                )}
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Pending kaiako requests */}
-        {(dataLoading || pendingKaiako.length > 0) && (
-          <div className="mt-8">
+        {/* Tab bar */}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const showBadge = tab.count !== undefined && (tab.countAlways || (tab.count ?? 0) > 0);
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-sans text-sm font-medium transition-colors border ${
+                  isActive
+                    ? "bg-primary/20 border-primary/40 text-primary"
+                    : "bg-iron-depth border-white/10 text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+                {showBadge && (
+                  <span className={`inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1.5 font-sans text-[11px] font-semibold ${
+                    tab.alert
+                      ? "bg-semantic-yellow/20 text-semantic-yellow"
+                      : isActive
+                        ? "bg-primary/30 text-primary"
+                        : "bg-white/10 text-white/50"
+                  }`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab content */}
+        <div className="mt-6">
+          {activeTab === "students" && (
+            <StudentsSection
+              students={students}
+              loading={dataLoading}
+              levelBySlug={levelBySlug}
+              studentAvatars={studentAvatars}
+            />
+          )}
+          {activeTab === "inbox" && (
+            <InboxSection
+              questions={unansweredQuestions}
+              allQuestions={questions}
+              onAnswered={handleAnswered}
+              loading={dataLoading}
+              levelNameBySlug={(slug) => levelBySlug[slug]?.name ?? slug}
+            />
+          )}
+          {activeTab === "requests" && (
             <PendingKaiakoSection
               requests={pendingKaiako}
               loading={dataLoading}
               callerId={member?.id ?? ""}
               onActioned={handleKaiakoActioned}
             />
-          </div>
-        )}
-
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <InboxSection
-            questions={unansweredQuestions}
-            allQuestions={questions}
-            onAnswered={handleAnswered}
-            loading={dataLoading}
-            levelNameBySlug={(slug) => levelBySlug[slug]?.name ?? slug}
-          />
-          <StudentsSection
-            students={students}
-            loading={dataLoading}
-            levelBySlug={levelBySlug}
-            studentAvatars={studentAvatars}
-          />
-        </div>
-
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          {/* Settings panel */}
-          <div className="rounded-2xl border border-white/10 bg-iron-depth p-7 md:p-8 flex flex-col gap-6">
-            <div className="flex items-center gap-3">
-              <Settings size={20} className="text-primary" />
-              <h2 className="font-display text-2xl text-white">settings</h2>
-            </div>
-
-            {/* Enrollment toggle */}
-            <div>
-              <p className="font-sans text-xs uppercase tracking-widest text-white/40 mb-3">Enrolments</p>
-              <div className="flex items-center justify-between gap-4 rounded-xl bg-midnight-tidal border border-white/10 px-5 py-4">
-                <div>
-                  <p className="font-sans text-sm font-medium text-white">New enrolments open</p>
-                  <p className="font-sans text-xs text-white/50 mt-0.5">
-                    {enrollmentOpen
-                      ? "Parents can sign up and enrol children."
-                      : "Registrations closed — visitors see an expression of interest form."}
-                  </p>
-                </div>
-                <button
-                  onClick={handleToggleEnrollment}
-                  disabled={togglingEnrollment || dataLoading}
-                  aria-label={enrollmentOpen ? "Close enrolments" : "Open enrolments"}
-                  className={`relative shrink-0 h-7 w-12 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                    enrollmentOpen ? "bg-semantic-green" : "bg-white/15"
-                  }`}
-                >
-                  <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${enrollmentOpen ? "translate-x-5" : "translate-x-0"}`} />
-                </button>
+          )}
+          {activeTab === "eoi" && (
+            <EoiSection eois={eois} loading={dataLoading} />
+          )}
+          {activeTab === "settings" && (
+            <div className="rounded-2xl border border-white/10 bg-iron-depth p-7 md:p-8 flex flex-col gap-6">
+              <div className="flex items-center gap-3">
+                <Settings size={20} className="text-primary" />
+                <h2 className="font-display text-2xl text-white">settings</h2>
               </div>
-            </div>
 
-            {/* Announcement banner */}
-            <div>
-              <p className="font-sans text-xs uppercase tracking-widest text-white/40 mb-3">Site announcement</p>
-              <div className="rounded-xl bg-midnight-tidal border border-white/10 p-5 flex flex-col gap-4">
-                {/* Show/hide toggle */}
-                <div className="flex items-center justify-between gap-4">
+              {/* Enrollment toggle */}
+              <div>
+                <p className="font-sans text-xs uppercase tracking-widest text-white/40 mb-3">Enrolments</p>
+                <div className="flex items-center justify-between gap-4 rounded-xl bg-midnight-tidal border border-white/10 px-5 py-4">
                   <div>
-                    <p className="font-sans text-sm font-medium text-white">Show announcement bar</p>
-                    <p className="font-sans text-xs text-white/50 mt-0.5">Displays a slim banner at the top of every page.</p>
+                    <p className="font-sans text-sm font-medium text-white">New enrolments open</p>
+                    <p className="font-sans text-xs text-white/50 mt-0.5">
+                      {enrollmentOpen
+                        ? "Parents can sign up and enrol children."
+                        : "Registrations closed — visitors see an expression of interest form."}
+                    </p>
                   </div>
                   <button
-                    onClick={() => setAnnouncement((a) => ({ ...a, visible: !a.visible }))}
-                    disabled={dataLoading}
-                    aria-label="Toggle announcement banner"
-                    className={`relative shrink-0 h-7 w-12 rounded-full transition-colors duration-200 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                      announcement.visible ? "bg-primary" : "bg-white/15"
+                    onClick={handleToggleEnrollment}
+                    disabled={togglingEnrollment || dataLoading}
+                    aria-label={enrollmentOpen ? "Close enrolments" : "Open enrolments"}
+                    className={`relative shrink-0 h-7 w-12 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                      enrollmentOpen ? "bg-semantic-green" : "bg-white/15"
                     }`}
                   >
-                    <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${announcement.visible ? "translate-x-5" : "translate-x-0"}`} />
-                  </button>
-                </div>
-
-                {/* Message text */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Message</label>
-                  <input
-                    type="text"
-                    value={announcement.text}
-                    onChange={(e) => setAnnouncement((a) => ({ ...a, text: e.target.value }))}
-                    placeholder="e.g. Term 2 enrolments are now open!"
-                    className="w-full bg-iron-depth border border-white/10 rounded-lg px-4 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
-                  />
-                </div>
-
-                {/* Optional link */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Link <span className="normal-case text-white/30">(optional)</span></label>
-                  <input
-                    type="text"
-                    value={announcement.link}
-                    onChange={(e) => setAnnouncement((a) => ({ ...a, link: e.target.value }))}
-                    placeholder="/enrolment/welcome or https://…"
-                    className="w-full bg-iron-depth border border-white/10 rounded-lg px-4 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
-                  />
-                </div>
-
-                {/* Style picker */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Colour</label>
-                  <div className="flex gap-2">
-                    {(["info", "success", "warning"] as const).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setAnnouncement((a) => ({ ...a, style: s }))}
-                        className={`flex-1 py-2 rounded-lg font-sans text-xs capitalize border transition-colors ${
-                          announcement.style === s
-                            ? s === "info" ? "bg-primary/20 border-primary text-primary"
-                              : s === "success" ? "bg-semantic-green/20 border-semantic-green text-semantic-green"
-                              : "bg-semantic-yellow/20 border-semantic-yellow text-semantic-yellow"
-                            : "bg-white/5 border-white/10 text-white/40 hover:border-white/20"
-                        }`}
-                      >
-                        {s === "info" ? "Teal" : s === "success" ? "Green" : "Yellow"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Save button */}
-                <div className="flex items-center justify-end gap-3 pt-1">
-                  {announcementSaved && (
-                    <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
-                      <Check size={12} /> Saved
-                    </span>
-                  )}
-                  <button
-                    onClick={handleSaveAnnouncement}
-                    disabled={announcementSaving || dataLoading}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-sans text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {announcementSaving ? <Loader2 size={13} className="animate-spin" /> : null}
-                    {announcementSaving ? "Saving…" : "Save announcement"}
+                    <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${enrollmentOpen ? "translate-x-5" : "translate-x-0"}`} />
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* EOI submissions */}
-          <EoiSection eois={eois} loading={dataLoading} />
+              {/* Announcement banner */}
+              <div>
+                <p className="font-sans text-xs uppercase tracking-widest text-white/40 mb-3">Site announcement</p>
+                <div className="rounded-xl bg-midnight-tidal border border-white/10 p-5 flex flex-col gap-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="font-sans text-sm font-medium text-white">Show announcement bar</p>
+                      <p className="font-sans text-xs text-white/50 mt-0.5">Displays a slim banner at the top of every page.</p>
+                    </div>
+                    <button
+                      onClick={() => setAnnouncement((a) => ({ ...a, visible: !a.visible }))}
+                      disabled={dataLoading}
+                      aria-label="Toggle announcement banner"
+                      className={`relative shrink-0 h-7 w-12 rounded-full transition-colors duration-200 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                        announcement.visible ? "bg-primary" : "bg-white/15"
+                      }`}
+                    >
+                      <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${announcement.visible ? "translate-x-5" : "translate-x-0"}`} />
+                    </button>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Message</label>
+                    <input
+                      type="text"
+                      value={announcement.text}
+                      onChange={(e) => setAnnouncement((a) => ({ ...a, text: e.target.value }))}
+                      placeholder="e.g. Term 2 enrolments are now open!"
+                      className="w-full bg-iron-depth border border-white/10 rounded-lg px-4 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Link <span className="normal-case text-white/30">(optional)</span></label>
+                    <input
+                      type="text"
+                      value={announcement.link}
+                      onChange={(e) => setAnnouncement((a) => ({ ...a, link: e.target.value }))}
+                      placeholder="/enrolment/welcome or https://…"
+                      className="w-full bg-iron-depth border border-white/10 rounded-lg px-4 py-2.5 font-sans text-sm text-white placeholder-white/25 focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-sans text-xs text-white/40 uppercase tracking-widest">Colour</label>
+                    <div className="flex gap-2">
+                      {(["info", "success", "warning"] as const).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => setAnnouncement((a) => ({ ...a, style: s }))}
+                          className={`flex-1 py-2 rounded-lg font-sans text-xs capitalize border transition-colors ${
+                            announcement.style === s
+                              ? s === "info" ? "bg-primary/20 border-primary text-primary"
+                                : s === "success" ? "bg-semantic-green/20 border-semantic-green text-semantic-green"
+                                : "bg-semantic-yellow/20 border-semantic-yellow text-semantic-yellow"
+                              : "bg-white/5 border-white/10 text-white/40 hover:border-white/20"
+                          }`}
+                        >
+                          {s === "info" ? "Teal" : s === "success" ? "Green" : "Yellow"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end gap-3 pt-1">
+                    {announcementSaved && (
+                      <span className="font-sans text-xs text-semantic-green flex items-center gap-1">
+                        <Check size={12} /> Saved
+                      </span>
+                    )}
+                    <button
+                      onClick={handleSaveAnnouncement}
+                      disabled={announcementSaving || dataLoading}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-sans text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {announcementSaving ? <Loader2 size={13} className="animate-spin" /> : null}
+                      {announcementSaving ? "Saving…" : "Save announcement"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>
