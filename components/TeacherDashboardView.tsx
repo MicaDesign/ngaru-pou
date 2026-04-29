@@ -316,12 +316,17 @@ export default function TeacherDashboardView({ levels }: Props) {
       <section className="site-container py-16 md:py-20">
         {/* Hero */}
         <div className="rounded-2xl bg-primary shadow-xl shadow-primary/20 px-7 py-8 md:px-10 md:py-10">
-          <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
-            Kaiako dashboard
-          </p>
-          <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
-            kia ora{firstName ? `, ${firstName}` : ""}
-          </h1>
+          <div className="flex items-center gap-6">
+            <Avatar src={avatarUrl} name={firstName || "Kaiako"} size={72} />
+            <div>
+              <p className="font-sans text-xs uppercase tracking-[0.25em] text-white/75 mb-2">
+                Kaiako dashboard
+              </p>
+              <h1 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
+                kia ora{firstName ? `, ${firstName}` : ""}
+              </h1>
+            </div>
+          </div>
         </div>
 
         {/* Tab bar */}
