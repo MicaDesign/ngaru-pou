@@ -46,16 +46,20 @@ function MilestoneRow({
   return (
     <div
       ref={rowRef}
-      className="grid grid-cols-[48px_20px_1fr] gap-x-5 sm:grid-cols-[80px_24px_1fr] sm:gap-x-8 pb-20 last:pb-0 items-start"
+      className="grid grid-cols-[100px_20px_1fr] gap-x-5 sm:grid-cols-[160px_24px_1fr] sm:gap-x-8 pb-20 last:pb-0 items-start"
     >
       {/* ── Year label — LEFT of the line ── */}
       <motion.div
-        className="text-right pt-1"
+        className="text-right"
+        style={{ marginTop: "-8px" }}
         initial={{ opacity: 0, x: 10 }}
         animate={inView ? { opacity: 1, x: 0 } : {}}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <p className="font-sans text-[11px] sm:text-sm font-bold text-primary leading-tight">
+        <p
+          className="font-display text-primary leading-none"
+          style={{ fontSize: "clamp(36px, 5vw, 60px)" }}
+        >
           {m.year}
         </p>
       </motion.div>
