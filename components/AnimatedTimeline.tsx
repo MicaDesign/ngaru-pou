@@ -2,28 +2,38 @@
 
 import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 const milestones = [
   {
     year: "2021",
     text: "Ngaru Pou Cultural Arts Inc. founded with a vision to bring culturally grounded learning online.",
+    image: "/images/ngarupou-2.jpg",
+    imageAlt: "Rakau — the traditional implements that inspired Ngaru Pou's founding",
   },
   {
     year: "2022",
     text: "First cohort of students enrolled across Te Pūmanawa and Te Pūkenga Rau levels.",
+    image: "/images/ngarupou-3.jpg",
+    imageAlt: "Kapa haka performer in traditional costume with taiaha",
   },
   {
     year: "2023",
     text: "Platform expanded to all three levels, with a dedicated kaiako messaging system launched.",
+    image: "/images/ngarupou-4.jpg",
+    imageAlt: "Young rangatahi in kapa haka costume with rakau",
   },
   {
     year: "2024",
     text: "Parent enrolment portal and student progress tracking introduced for a complete whānau experience.",
+    image: "/images/ngarupou-5.jpg",
+    imageAlt: "Three young wāhine smiling in kapa haka uniforms",
   },
   {
     year: "2025",
     text: "New multimedia lessons, digital achievements, and a redesigned platform rolled out community-wide.",
+    image: "/images/ngarupou-6.jpg",
+    imageAlt: "Four members of the Ngaru Pou whānau holding a carved taonga together",
   },
 ];
 
@@ -94,18 +104,20 @@ function MilestoneRow({
 
       {/* ── Content — RIGHT of the line ── */}
       <div className="min-w-0">
-        {/* Placeholder image */}
+        {/* Milestone image */}
         <motion.div
-          className="relative rounded-2xl overflow-hidden aspect-video mb-5 flex flex-col items-center justify-center gap-2 border-2 border-dashed"
-          style={{ borderColor: `${GRAD_MID}30`, background: `${GRAD_MID}08` }}
+          className="relative rounded-2xl overflow-hidden aspect-video mb-5"
           initial={{ opacity: 0, y: 14 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.15 }}
         >
-          <ImageIcon size={28} style={{ color: `${GRAD_MID}50` }} strokeWidth={1.5} />
-          <span className="font-sans text-xs uppercase tracking-[0.12em]" style={{ color: `${GRAD_MID}60` }}>
-            Add photo for {m.year}
-          </span>
+          <Image
+            src={m.image}
+            alt={m.imageAlt}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 500px"
+          />
         </motion.div>
 
         {/* Description */}
