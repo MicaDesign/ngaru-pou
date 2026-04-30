@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { ImageIcon } from "lucide-react";
 
 const milestones = [
   {
@@ -26,6 +27,12 @@ const milestones = [
   },
 ];
 
+// Logo-inspired gradient: indigo/purple → teal → lagoon-drift
+const GRAD_TOP = "#5b5fef";
+const GRAD_MID = "#2ca3bb";
+const GRAD_BOT = "#60cad8";
+const LINE_GRADIENT = `linear-gradient(to bottom, ${GRAD_TOP}, ${GRAD_MID}, ${GRAD_BOT})`;
+
 function MilestoneRow({
   m,
   dotRef,
@@ -37,41 +44,72 @@ function MilestoneRow({
   const inView = useInView(rowRef, { once: true, margin: "-60px 0px" });
 
   return (
-    <div ref={rowRef} className="relative flex items-start gap-10 pb-16 last:pb-0">
-      {/* Dot */}
-      <div ref={dotRef} className="relative z-10 flex-shrink-0 mt-1">
-        {/* Pulse ring — fires once when row enters view */}
+    <div
+      ref={rowRef}
+      className="grid grid-cols-[48px_20px_1fr] gap-x-5 sm:grid-cols-[80px_24px_1fr] sm:gap-x-8 pb-20 last:pb-0 items-start"
+    >
+      {/* ── Year label — LEFT of the line ── */}
+      <motion.div
+        className="text-right pt-1"
+        initial={{ opacity: 0, x: 10 }}
+        animate={inView ? { opacity: 1, x: 0 } : {}}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
+        <p className="font-sans text-[11px] sm:text-sm font-bold text-primary leading-tight">
+          {m.year}
+        </p>
+      </motion.div>
+
+      {/* ── Dot — ON the line ── */}
+      <div className="flex justify-center items-start pt-1 relative z-10">
+        {/* Pulse ring */}
         <motion.div
-          className="absolute rounded-full border border-primary/60"
-          style={{ inset: "-6px" }}
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={inView ? { scale: 1.8, opacity: [0.7, 0] } : {}}
-          transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
+          className="absolute rounded-full"
+          style={{
+            width: 28,
+            height: 28,
+            top: -6,
+            left: "50%",
+            translateX: "-50%",
+            border: `1px solid ${GRAD_MID}80`,
+          }}
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={inView ? { scale: 1.9, opacity: [0.6, 0] } : {}}
+          transition={{ duration: 0.8, delay: 0.15 }}
         />
-        {/* Dot fill */}
+        {/* Dot */}
         <motion.div
-          className="h-4 w-4 rounded-full border-2 border-primary"
+          ref={dotRef}
+          className="h-4 w-4 rounded-full border-2 flex-shrink-0"
+          style={{ borderColor: GRAD_MID }}
           initial={{ backgroundColor: "#e1f2ff" }}
-          animate={inView ? { backgroundColor: "#2ca3bb" } : {}}
+          animate={inView ? { backgroundColor: GRAD_MID } : {}}
           transition={{ duration: 0.35, delay: 0.1 }}
         />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <motion.p
-          className="font-sans text-xs font-bold text-primary uppercase tracking-[0.15em] mb-2"
-          initial={{ opacity: 0, x: -12 }}
-          animate={inView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
+      {/* ── Content — RIGHT of the line ── */}
+      <div className="min-w-0">
+        {/* Placeholder image */}
+        <motion.div
+          className="relative rounded-2xl overflow-hidden aspect-video mb-5 flex flex-col items-center justify-center gap-2 border-2 border-dashed"
+          style={{ borderColor: `${GRAD_MID}30`, background: `${GRAD_MID}08` }}
+          initial={{ opacity: 0, y: 14 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.15 }}
         >
-          {m.year}
-        </motion.p>
+          <ImageIcon size={28} style={{ color: `${GRAD_MID}50` }} strokeWidth={1.5} />
+          <span className="font-sans text-xs uppercase tracking-[0.12em]" style={{ color: `${GRAD_MID}60` }}>
+            Add photo for {m.year}
+          </span>
+        </motion.div>
+
+        {/* Description */}
         <motion.p
-          className="font-sans text-iron-depth/85 text-[1.05rem] leading-relaxed"
-          initial={{ opacity: 0, x: 12 }}
-          animate={inView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+          className="font-sans text-iron-depth/80 text-[1.05rem] leading-relaxed"
+          initial={{ opacity: 0, y: 8 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
           {m.text}
         </motion.p>
@@ -85,16 +123,14 @@ export default function AnimatedTimeline() {
   const firstDotRef = useRef<HTMLDivElement>(null);
   const lastDotRef = useRef<HTMLDivElement>(null);
 
-  // Track line bounds measured from dot centres
-  const [trackTop, setTrackTop] = useState(0);
-  const [trackHeight, setTrackHeight] = useState(0);
+  const [track, setTrack] = useState({ top: 0, left: 0, height: 0 });
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start 80%", "end 55%"],
   });
 
-  const indicatorY = useTransform(scrollYProgress, [0, 1], [0, trackHeight]);
+  const indicatorY = useTransform(scrollYProgress, [0, 1], [0, track.height]);
 
   useEffect(() => {
     const measure = () => {
@@ -107,11 +143,11 @@ export default function AnimatedTimeline() {
       const fRect = first.getBoundingClientRect();
       const lRect = last.getBoundingClientRect();
 
-      const top = fRect.top + fRect.height / 2 - cRect.top;
-      const bottom = lRect.top + lRect.height / 2 - cRect.top;
-
-      setTrackTop(top);
-      setTrackHeight(bottom - top);
+      setTrack({
+        top: fRect.top + fRect.height / 2 - cRect.top,
+        left: fRect.left + fRect.width / 2 - cRect.left - 1,
+        height: lRect.top + lRect.height / 2 - (fRect.top + fRect.height / 2),
+      });
     };
 
     measure();
@@ -120,40 +156,54 @@ export default function AnimatedTimeline() {
   }, []);
 
   return (
-    <div ref={sectionRef} className="max-w-2xl mx-auto relative">
-      {/* Track line — absolutely positioned between first and last dot centres */}
-      {trackHeight > 0 && (
+    <div ref={sectionRef} className="max-w-3xl mx-auto relative">
+
+      {/* ── Gradient track line ── */}
+      {track.height > 0 && (
         <div
-          className="absolute left-[7px] pointer-events-none"
-          style={{ top: trackTop, height: trackHeight }}
+          className="absolute pointer-events-none"
+          style={{ top: track.top, left: track.left, height: track.height, width: 2 }}
         >
           {/* Faded background track */}
-          <div className="absolute inset-x-0 top-0 bottom-0 w-0.5 bg-primary/15 rounded-full" />
+          <div
+            className="absolute inset-0 rounded-full opacity-20"
+            style={{ background: LINE_GRADIENT }}
+          />
 
-          {/* Animated fill line */}
+          {/* Animated fill */}
           <motion.div
-            className="absolute inset-x-0 top-0 bottom-0 w-0.5 bg-primary rounded-full origin-top"
-            style={{ scaleY: scrollYProgress }}
+            className="absolute inset-0 rounded-full origin-top"
+            style={{ scaleY: scrollYProgress, background: LINE_GRADIENT }}
           />
 
           {/* Travelling glow dot */}
           <motion.div
-            className="absolute w-3 h-3 rounded-full bg-primary shadow-[0_0_14px_5px_rgba(44,163,187,0.4)]"
+            className="absolute rounded-full"
             style={{
-              left: "-5px",
+              left: -5,
+              width: 12,
+              height: 12,
               top: indicatorY,
               translateY: "-50%",
+              background: GRAD_MID,
+              boxShadow: `0 0 14px 5px ${GRAD_MID}55`,
             }}
           />
         </div>
       )}
 
-      {/* Milestone rows */}
+      {/* ── Milestone rows ── */}
       {milestones.map((m, i) => (
         <MilestoneRow
           key={m.year}
           m={m}
-          dotRef={i === 0 ? firstDotRef : i === milestones.length - 1 ? lastDotRef : undefined}
+          dotRef={
+            i === 0
+              ? firstDotRef
+              : i === milestones.length - 1
+              ? lastDotRef
+              : undefined
+          }
         />
       ))}
     </div>
