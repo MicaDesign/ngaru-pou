@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Users, Heart, Globe2, Sparkles } from "lucide-react";
 import FadeUp from "@/components/FadeUp";
 import PageHero from "@/components/PageHero";
+import AnimatedTimeline from "@/components/AnimatedTimeline";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -34,13 +35,6 @@ const values = [
   },
 ];
 
-const milestones = [
-  { year: "2021", text: "Ngaru Pou Cultural Arts Inc. founded with a vision to bring culturally grounded learning online." },
-  { year: "2022", text: "First cohort of students enrolled across Te Pūmanawa and Te Pūkenga Rau levels." },
-  { year: "2023", text: "Platform expanded to all three levels, with a dedicated kaiako messaging system launched." },
-  { year: "2024", text: "Parent enrolment portal and student progress tracking introduced for a complete whānau experience." },
-  { year: "2025", text: "New multimedia lessons, digital achievements, and a redesigned platform rolled out community-wide." },
-];
 
 export default function AboutUsPage() {
   return (
@@ -246,26 +240,7 @@ export default function AboutUsPage() {
             </h2>
           </FadeUp>
 
-          <div className="max-w-2xl mx-auto">
-            {milestones.map((m, i) => (
-              <FadeUp key={m.year} delay={i * 0.07}>
-                <div className="flex gap-6 pb-10 last:pb-0">
-                  <div className="flex flex-col items-center">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 border border-primary/30">
-                      <span className="font-sans text-[10px] font-bold text-primary">{m.year}</span>
-                    </div>
-                    {i < milestones.length - 1 && (
-                      <div className="mt-2 flex-1 w-px bg-midnight-tidal/15" />
-                    )}
-                  </div>
-                  <div className="pb-2">
-                    <p className="font-sans text-sm font-semibold text-primary mb-1">{m.year}</p>
-                    <p className="font-sans text-iron-depth/85 text-[1.05rem] leading-relaxed">{m.text}</p>
-                  </div>
-                </div>
-              </FadeUp>
-            ))}
-          </div>
+          <AnimatedTimeline />
         </div>
       </section>
 
