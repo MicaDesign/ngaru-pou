@@ -115,7 +115,7 @@ function MilestoneRow({
             src={m.image}
             alt={m.imageAlt}
             fill
-            className="object-cover"
+            className="object-cover object-top"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 500px"
           />
         </motion.div>
