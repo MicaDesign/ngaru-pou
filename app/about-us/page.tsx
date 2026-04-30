@@ -212,7 +212,7 @@ export default function AboutUsPage() {
               </div>
             </FadeUp>
             <FadeUp direction="right" className="order-1 lg:order-2">
-              <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
+              <div className="relative rounded-2xl overflow-hidden aspect-[2/3]">
                 <Image
                   src="/images/3-moari-girls.avif"
                   alt="Rangatahi in the Ngaru Pou community"
