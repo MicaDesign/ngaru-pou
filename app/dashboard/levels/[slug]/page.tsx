@@ -60,11 +60,6 @@ export default async function LevelPage({ params }: Props) {
                 <h1 className="font-display text-5xl md:text-6xl text-white">
                   {level.name}
                 </h1>
-                {level.ageRange && (
-                  <span className="font-sans text-sm text-primary bg-primary/10 rounded-full px-3 py-1">
-                    {level.ageRange}
-                  </span>
-                )}
               </div>
 
               {level.objectives && (

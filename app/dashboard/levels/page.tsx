@@ -45,11 +45,6 @@ function LevelCard({ level, index }: { level: Level; index: number }) {
             <p className="font-sans text-xs uppercase tracking-[0.25em] text-primary">
               Level {index + 1}
             </p>
-            {level.ageRange && (
-              <span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/30 px-3 py-1 font-sans text-xs font-medium text-primary">
-                {level.ageRange}
-              </span>
-            )}
           </div>
 
           <h2 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
