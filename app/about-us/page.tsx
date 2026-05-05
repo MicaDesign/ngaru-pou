@@ -9,29 +9,29 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About Us — Ngaru Pou",
   description:
-    "Learn about Ngaru Pou Cultural Arts Inc. — who we are, what drives us, and why we built a learning platform rooted in te ao Māori.",
+    "Ngaru Pou Inc. is a community-focused organisation in Western Australia dedicated to empowering rangatahi through Te Ao Haka — grounding them in cultural identity while preparing them for the world.",
 };
 
 const values = [
   {
     icon: Heart,
     title: "Manaakitanga",
-    body: "We lead with care and respect for every learner, every whānau, and every community we serve. Kindness is not an afterthought — it is the foundation.",
+    body: "We create safe environments where every learner, every whānau, and every community member feels valued, heard, and supported. Care is not an afterthought — it is the foundation of everything we do.",
   },
   {
     icon: Globe2,
     title: "Whakapapa",
-    body: "Identity is the thread that connects past, present, and future. Everything we build honours the lineage, language, and stories that make our learners who they are.",
+    body: "Cultural identity, language, and whakapapa are at the heart of our programmes. We ground our rangatahi in who they are and where they come from — so they can navigate both worlds with strength and confidence.",
   },
   {
     icon: Users,
     title: "Kotahitanga",
-    body: "We are stronger together. Ngaru Pou was built through community, for community — and we are committed to growing that collective strength with everything we do.",
+    body: "We work closely with individuals, families, and community partners to build capacity and support long-term growth. Ngaru Pou was built through community, for community — and we are stronger together.",
   },
   {
     icon: Sparkles,
     title: "Tūāhuatanga",
-    body: "Excellence matters. We hold our learners to high expectations because we believe deeply in their potential — and we build tools worthy of that belief.",
+    body: "We hold high expectations because we believe deeply in our learners&apos; potential. Through Te Ao Haka, we nurture excellence in performance, self-belief, and cultural pride — preparing rangatahi to shine.",
   },
 ];
 
@@ -42,7 +42,7 @@ export default function AboutUsPage() {
       <PageHero
         eyebrow="About Us"
         heading={<>grounded in culture.<br />built for rangatahi.</>}
-        body="Ngaru Pou Cultural Arts Inc. is a community organisation dedicated to the educational, cultural, and personal development of Māori students. We exist because we believe every rangatahi deserves learning that sees them fully — and lifts them higher."
+        body="Ngaru Pou Inc. is a community-focused organisation in Western Australia dedicated to empowering rangatahi through Te Ao Haka. We strengthen cultural identity, build confidence, and support every young person to stand proudly in both their Māori heritage and the world around them."
       />
 
       {/* Who We Are */}
@@ -53,7 +53,7 @@ export default function AboutUsPage() {
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                 <Image
                   src="/images/maori-kapa-haka-group.avif"
-                  alt="Ngaru Pou community"
+                  alt="Ngaru Pou rangatahi performing kapa haka"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -67,26 +67,31 @@ export default function AboutUsPage() {
                 </p>
               </div>
               <h2 className="section-h2 font-display text-white mb-6">
-                a community, not just a platform
+                more than a programme — a movement
               </h2>
               <div className="space-y-4 font-sans text-white/65 text-[1.1rem] leading-relaxed">
                 <p>
-                  Ngaru Pou Cultural Arts Inc. was founded by educators,
-                  parents, and cultural practitioners who saw a gap — Māori
-                  students were being asked to succeed in systems that didn&apos;t
-                  reflect who they were. We set out to change that.
+                  Ngaru Pou Inc. is a community-focused organisation dedicated
+                  to empowering individuals, strengthening families, and building
+                  resilient communities here in Western Australia. Through
+                  high-quality programmes and support services, we promote
+                  wellbeing, personal development, and positive life outcomes for
+                  rangatahi aged 3 to 19 and beyond.
                 </p>
                 <p>
-                  Our name means &ldquo;the wave post&rdquo; — a symbol of
-                  strength, continuity, and connection. Like the waves that have
-                  shaped Aotearoa&apos;s shores for generations, we believe
-                  knowledge should be a living, moving force that carries
-                  rangatahi forward while keeping them anchored to their roots.
+                  Our approach is grounded in <strong className="text-white/85">Te Ao Haka</strong> — integrating
+                  cultural identity, language, movement, and storytelling so that
+                  every programme reflects tikanga and mātauranga Māori. Through
+                  haka, waiata, poi, mōteatea, and performance, our students
+                  connect with their culture, build confidence, and develop a
+                  strong sense of who they are and where they belong.
                 </p>
                 <p>
-                  We are kaiako, whānau, community members, and learners
-                  ourselves. Every decision we make is guided by a simple
-                  question: does this serve our students and their futures?
+                  We work hand in hand with individuals, whānau, and community
+                  partners — taking a holistic approach that addresses challenges,
+                  builds capacity, and supports each young person to reach their
+                  full potential. Our goal is a lasting, positive impact in the
+                  communities we serve.
                 </p>
               </div>
             </FadeUp>
@@ -104,22 +109,34 @@ export default function AboutUsPage() {
               </p>
             </div>
             <h2 className="section-h2 font-display text-primary mb-8">
-              learning rooted in identity
+              navigating both worlds with confidence
             </h2>
             <p className="font-sans text-iron-depth text-[1.2rem] leading-[1.65] mb-6">
-              Our mission is to provide high-quality, culturally grounded
-              education that strengthens both academic achievement and Māori
-              identity. We believe these two things are not in tension — they
-              are inseparable.
+              Our primary focus is rangatahi — supporting them to build the
+              confidence to stand proudly here in Australia while remaining
+              grounded in who they are and where they come from. We don&apos;t ask
+              our learners to choose between worlds. We equip them to navigate
+              both with strength.
             </p>
-            <p className="font-sans text-iron-depth/80 text-[1.1rem] leading-relaxed">
-              Through Ngaru Pou, we create pathways where rangatahi can develop
-              real-world skills — literacy, numeracy, critical thinking, and
-              digital fluency — while deepening their understanding of
-              whakapapa, tikanga, and te reo Māori. We don&apos;t ask our
-              learners to leave their identity at the door. We ask them to bring
-              it to the centre.
+            <p className="font-sans text-iron-depth/80 text-[1.1rem] leading-relaxed mb-10">
+              Through Te Ao Haka, we provide students with exposure to te reo me
+              ōna tikanga, whakapapa, and whanaungatanga — enabling them to
+              develop self-belief, resilience, and pride in their cultural
+              identity. Students move at their own pace, because we honour
+              individual learning journeys and recognise that every young person
+              grows in their own time and in their own way.
             </p>
+            {/* Whakatauki */}
+            <div className="border-t border-primary/30 pt-8 mt-2">
+              <p className="font-display text-2xl md:text-3xl text-primary leading-snug mb-3">
+                Nau tou rourou, nau toku rourou,
+                <br />
+                ka ora ai te iwi
+              </p>
+              <p className="font-sans text-iron-depth/60 text-sm uppercase tracking-[0.15em]">
+                With your food basket and my food basket, the people will thrive
+              </p>
+            </div>
           </FadeUp>
         </div>
       </section>
@@ -138,7 +155,7 @@ export default function AboutUsPage() {
             </h2>
             <p className="font-sans text-white/55 text-[1.1rem] max-w-xl mx-auto leading-relaxed">
               These aren&apos;t just words on a page — they are the commitments
-              that shape how we build, teach, and show up for our community
+              that shape how we teach, connect, and show up for our community
               every day.
             </p>
           </FadeUp>
@@ -174,23 +191,24 @@ export default function AboutUsPage() {
               </h2>
               <div className="space-y-4 font-sans text-white/65 text-[1.1rem] leading-relaxed">
                 <p>
-                  Ngaru Pou started in a community hall with a handful of
-                  kaiako, a shared vision, and a lot of determination. Since
-                  then, our whānau has grown — learners from across Aotearoa and
-                  beyond have joined the platform, and our community of kaiako
-                  continues to grow alongside them.
+                  Ngaru Pou was built from the ground up by educators, parents,
+                  and cultural practitioners who believed that Māori rangatahi in
+                  Australia deserved something better — programmes that truly see
+                  them, celebrate who they are, and prepare them for the future.
                 </p>
                 <p>
-                  We take the responsibility of online learning seriously.
-                  Families trust us with their most precious taonga — their
-                  children — and we honour that trust through thoughtful design,
-                  safe systems, and a genuine commitment to every student&apos;s
-                  wellbeing and success.
+                  Through inclusive and culturally responsive practices, we
+                  create safe environments where people feel valued, heard, and
+                  supported. Our work extends beyond the classroom — we partner
+                  with families and communities to address challenges and support
+                  long-term growth, because we know that when the whole whānau
+                  thrives, so does every individual within it.
                 </p>
                 <p>
-                  If you&apos;re a kaiako interested in joining our team, a parent
-                  considering enrolment, or simply someone who believes in what
-                  we&apos;re building — we&apos;d love to hear from you.
+                  We also host the <strong className="text-white/85">Ngaru Pou Cultural Arts Festival</strong>, giving our
+                  rangatahi the opportunity to perform, compete, and celebrate
+                  their culture together — including pathways into
+                  Te Hononga Moemoea, our secondary kapahaka competition.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4 mt-8">
