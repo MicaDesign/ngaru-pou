@@ -47,9 +47,16 @@ function LevelCard({ level, index }: { level: Level; index: number }) {
             </p>
           </div>
 
-          <h2 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
-            {level.name}
-          </h2>
+          <div>
+            <h2 className="font-display text-4xl md:text-5xl text-white leading-[1.05]">
+              {level.name}
+            </h2>
+            {level.tagline && (
+              <p className="font-sans text-white/50 text-sm mt-2 italic">
+                {level.tagline}
+              </p>
+            )}
+          </div>
 
           {objectives.length > 0 && (
             <ul className="space-y-2">

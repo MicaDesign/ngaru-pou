@@ -56,10 +56,15 @@ export default async function LevelPage({ params }: Props) {
             </div>
 
             <div className="md:col-span-3 flex flex-col gap-8">
-              <div className="flex items-baseline gap-4 flex-wrap">
+              <div className="flex flex-col gap-2">
                 <h1 className="font-display text-5xl md:text-6xl text-white">
                   {level.name}
                 </h1>
+                {level.tagline && (
+                  <p className="font-sans text-white/50 text-sm italic">
+                    {level.tagline}
+                  </p>
+                )}
               </div>
 
               {level.objectives && (

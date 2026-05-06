@@ -27,6 +27,7 @@ export type Level = {
   name: string;
   slug: string;
   order?: number;
+  tagline: string;
   ageRange: string;
   objectives: string;
   keyFeatures: string;
@@ -181,6 +182,7 @@ function parseLevel(r: AirtableRecord): Level {
     name: str(f["Name"]),
     slug: str(f["Slug"]),
     order: typeof f["Order"] === "number" ? (f["Order"] as number) : undefined,
+    tagline: str(f["Tagline"]),
     ageRange: str(f["Age Range"]),
     objectives: str(f["Objectives"]),
     keyFeatures: str(f["Key Features"]),
