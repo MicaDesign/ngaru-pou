@@ -11,8 +11,10 @@ import {
   LayoutDashboard,
   BookOpen,
   LogOut,
+  Disc2,
 } from "lucide-react";
 import { getMemberstack } from "@/lib/memberstack";
+import { isKaiako } from "@/lib/kaiako";
 import NavBell from "@/components/NavBell";
 import Avatar from "@/components/Avatar";
 import { getMemberAvatarUrl } from "@/lib/avatars";
@@ -27,6 +29,7 @@ type Member = {
   id?: string;
   auth?: { email?: string };
   customFields?: Record<string, unknown>;
+  planConnections?: { planId?: string; active?: boolean }[];
 } | null;
 
 function pickString(src: Record<string, unknown> | undefined, ...keys: string[]) {
@@ -248,6 +251,20 @@ export default function Nav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3 min-w-[180px] justify-end">
+          {member?.id && isKaiako(member) && (
+            <Link
+              href="/dashboard/spin"
+              aria-label="Spin the wheel"
+              title="Spin the wheel"
+              className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-200 ${
+                isActive("/dashboard/spin")
+                  ? "border-primary text-primary"
+                  : "border-white/15 text-white/60 hover:border-white/30 hover:text-white"
+              }`}
+            >
+              <Disc2 size={16} />
+            </Link>
+          )}
           {member?.id && <NavBell memberId={member.id} />}
           {authButtons}
         </div>
