@@ -91,6 +91,7 @@ export default function SpinWheel() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState<WheelEntry[]>([]);
+  const [segmentOverride, setSegmentOverride] = useState<Segment[] | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
@@ -165,7 +166,7 @@ export default function SpinWheel() {
 
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    const segs = buildSegments(entries);
+    const segs = segmentOverride ?? buildSegments(entries);
 
     if (segs.length === 0) {
       ctx.beginPath();
@@ -240,7 +241,7 @@ export default function SpinWheel() {
     ctx.strokeStyle = "#2ca3bb";
     ctx.lineWidth = 2;
     ctx.stroke();
-  }, [entries]);
+  }, [entries, segmentOverride]);
 
   useEffect(() => {
     drawWheel();
@@ -249,7 +250,7 @@ export default function SpinWheel() {
   // ── Spin animation ────────────────────────────────────────────────────────
 
   const spin = useCallback(() => {
-    const segs = buildSegments(entries);
+    const segs = segmentOverride ?? buildSegments(entries);
     if (segs.length === 0 || spinning) return;
 
     setSpinning(true);
@@ -282,7 +283,7 @@ export default function SpinWheel() {
     }
 
     rafRef.current = requestAnimationFrame(frame);
-  }, [entries, spinning, drawWheel]);
+  }, [entries, segmentOverride, spinning, drawWheel]);
 
   useEffect(() => () => { cancelAnimationFrame(rafRef.current); }, []);
 
@@ -295,6 +296,7 @@ export default function SpinWheel() {
   }
 
   function addToWheel(person: Person, count: number) {
+    setSegmentOverride(null); // reset shuffle so new entry appears in natural order
     setEntries((prev) => {
       const idx = prev.findIndex((e) => e.personId === person.id);
       if (idx >= 0) {
@@ -316,11 +318,13 @@ export default function SpinWheel() {
   }
 
   function removeEntry(personId: string) {
+    setSegmentOverride(null);
     setEntries((prev) => prev.filter((e) => e.personId !== personId));
   }
 
   function removeWinnerFromWheel() {
     if (!winner) return;
+    setSegmentOverride(null);
     setEntries((prev) => {
       const idx = prev.findIndex((e) => e.name === winner);
       if (idx < 0) return prev;
@@ -331,14 +335,15 @@ export default function SpinWheel() {
   }
 
   function shuffleEntries() {
-    setEntries((prev) => {
-      const arr = [...prev];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    });
+    // Expand every entry into individual segments, then Fisher-Yates shuffle
+    // across ALL slots so the same person's tickets are spread randomly
+    // around the wheel rather than grouped together.
+    const flat = buildSegments(entries);
+    for (let i = flat.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [flat[i], flat[j]] = [flat[j], flat[i]];
+    }
+    setSegmentOverride(flat);
   }
 
   // ── Filtering ─────────────────────────────────────────────────────────────
@@ -537,7 +542,7 @@ export default function SpinWheel() {
                 </span>
               </h3>
               <button
-                onClick={() => { setEntries([]); colorCounterRef.current = 0; }}
+                onClick={() => { setEntries([]); setSegmentOverride(null); colorCounterRef.current = 0; }}
                 className="font-sans text-xs text-white/30 hover:text-semantic-red transition-colors flex items-center gap-1.5"
               >
                 <Trash2 size={11} />
