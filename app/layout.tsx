@@ -10,7 +10,7 @@ import LayoutShell from "@/components/LayoutShell";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: "swap",
+  display: "optional",
 });
 
 const ngaMihi = localFont({
