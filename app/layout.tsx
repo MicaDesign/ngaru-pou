@@ -19,12 +19,51 @@ const ngaMihi = localFont({
   display: "swap",
 });
 
+const SITE_URL = "https://www.ngarupou.org.au";
+const DEFAULT_DESCRIPTION =
+  "Ngaru Pou empowers rangatahi through kapa haka, waiata, and culturally grounded education in Western Australia. Discover your identity through te ao Māori.";
+
 export const metadata: Metadata = {
-  title: "Ngaru Pou",
-  description:
-    "Ngaru Pou supports Māori students to thrive in both te ao Māori and te ao whānui.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Ngaru Pou — Māori Cultural Arts",
+    template: "%s — Ngaru Pou",
+  },
+  description: DEFAULT_DESCRIPTION,
+  keywords: [
+    "Māori", "kapa haka", "te reo Māori", "waiata", "rangatahi",
+    "Western Australia", "cultural arts", "Ngaru Pou", "te ao Māori",
+    "Māori education", "tamariki",
+  ],
+  authors: [{ name: "Ngaru Pou Cultural Arts Inc.", url: SITE_URL }],
+  creator: "Ngaru Pou Cultural Arts Inc.",
+  openGraph: {
+    type: "website",
+    locale: "en_AU",
+    url: SITE_URL,
+    siteName: "Ngaru Pou",
+    title: "Ngaru Pou — Māori Cultural Arts",
+    description: DEFAULT_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ngaru Pou — Māori Cultural Arts",
+    description: DEFAULT_DESCRIPTION,
+  },
   icons: {
     icon: "/images/logo-icon-4.svg",
+    apple: "/images/logo-icon-4.svg",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -34,7 +73,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="mi" className={`${inter.variable} ${ngaMihi.variable}`}>
+    <html lang="en-AU" className={`${inter.variable} ${ngaMihi.variable}`}>
       <body className="font-sans flex flex-col min-h-screen">
         <MemberstackProvider>
           <LayoutShell>{children}</LayoutShell>

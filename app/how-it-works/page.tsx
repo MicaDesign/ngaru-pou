@@ -6,9 +6,15 @@ import PageHero from "@/components/PageHero";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "How It Works — Ngaru Pou",
+  title: "How It Works",
   description:
     "Discover how Ngaru Pou works — from signing up and enrolling your tamariki, to progressing through culturally grounded lessons at every level.",
+  openGraph: {
+    title: "How It Works — Ngaru Pou",
+    description:
+      "Discover how Ngaru Pou works — from signing up and enrolling your tamariki, to progressing through culturally grounded lessons.",
+    url: "/how-it-works",
+  },
 };
 
 const steps = [

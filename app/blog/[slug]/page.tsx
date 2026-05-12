@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -5,6 +6,35 @@ import { CalendarDays, User, ArrowLeft } from "lucide-react";
 import { getBlogPostBySlug, getBlogPosts } from "@/lib/airtable";
 
 type Props = { params: { slug: string } };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const post = await getBlogPostBySlug(params.slug);
+  if (!post) return { title: "Post not found" };
+
+  const ogImages = post.coverImage?.[0]?.url
+    ? [{ url: post.coverImage[0].url, alt: post.title }]
+    : [];
+
+  return {
+    title: post.title,
+    description: post.excerpt || undefined,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || undefined,
+      type: "article",
+      url: `/blog/${post.slug}`,
+      publishedTime: post.publishedDate || undefined,
+      authors: post.author ? [post.author] : undefined,
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt || undefined,
+      images: ogImages.map((i) => i.url),
+    },
+  };
+}
 
 const CATEGORY_COLOURS: Record<string, string> = {
   Culture:   "bg-primary/15 text-primary",

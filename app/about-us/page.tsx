@@ -7,9 +7,15 @@ import AnimatedTimeline from "@/components/AnimatedTimeline";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Us — Ngaru Pou",
+  title: "About Us",
   description:
     "Ngaru Pou Inc. is a community-focused organisation in Western Australia dedicated to empowering rangatahi through Te Ao Haka — grounding them in cultural identity while preparing them for the world.",
+  openGraph: {
+    title: "About Us — Ngaru Pou",
+    description:
+      "Ngaru Pou Inc. is a community-focused organisation in Western Australia dedicated to empowering rangatahi through Te Ao Haka.",
+    url: "/about-us",
+  },
 };
 
 const values = [

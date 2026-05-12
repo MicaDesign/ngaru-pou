@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import HeroSection from "@/components/HeroSection";
 import KaupapaSection from "@/components/KaupapaSection";
 import IdentitySection from "@/components/IdentitySection";
@@ -5,6 +6,20 @@ import EngageSection from "@/components/EngageSection";
 import CommunitySection from "@/components/CommunitySection";
 import GallerySection from "@/components/GallerySection";
 import { getGalleryItems, type GalleryItem } from "@/lib/airtable";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "Ngaru Pou — Māori Cultural Arts",
+  },
+  description:
+    "Ngaru Pou empowers rangatahi through kapa haka, waiata, and culturally grounded education in Western Australia. Discover your identity through te ao Māori.",
+  openGraph: {
+    title: "Ngaru Pou — Māori Cultural Arts",
+    description:
+      "Ngaru Pou empowers rangatahi through kapa haka, waiata, and culturally grounded education in Western Australia.",
+    url: "/",
+  },
+};
 
 // For any video item without a manually uploaded thumbnail, fetch one from
 // Vimeo's public oEmbed API. Results are cached for 1 hour on the server.

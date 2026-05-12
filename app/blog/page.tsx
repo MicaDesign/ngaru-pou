@@ -1,9 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarDays, User } from "lucide-react";
 import { getBlogPosts } from "@/lib/airtable";
 import FadeUp from "@/components/FadeUp";
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description:
+    "Stories, insights, and updates from the Ngaru Pou whānau — exploring culture, education, and community.",
+  openGraph: {
+    title: "Blog — Ngaru Pou",
+    description:
+      "Stories, insights, and updates from the Ngaru Pou whānau — exploring culture, education, and community.",
+    url: "/blog",
+  },
+};
 
 const CATEGORY_COLOURS: Record<string, string> = {
   Culture:   "bg-primary/15 text-primary",
