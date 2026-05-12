@@ -12,6 +12,7 @@ export default function HeroSection() {
           alt=""
           aria-hidden="true"
           fill
+          priority
           className="pointer-events-none select-none object-cover object-[50%_20%] opacity-[0.15] mix-blend-soft-light"
           sizes="100vw"
         />

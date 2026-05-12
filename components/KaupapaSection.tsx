@@ -59,9 +59,9 @@ export default function KaupapaSection() {
             <FadeUp key={heading} delay={i * 0.1}>
               <div className="flex h-full flex-col items-center gap-4 rounded-2xl px-4 py-3 text-center transition-all duration-200 ease-[cubic-bezier(.165,.84,.44,1)] hover:-translate-y-0.5 hover:bg-midnight-tidal/[0.04]">
                 <Icon size={48} className="text-primary flex-shrink-0" strokeWidth={1.5} />
-                <h4 className="font-sans font-semibold text-primary text-[1.25rem] leading-[1.2]">
+                <h3 className="font-sans font-semibold text-primary text-[1.25rem] leading-[1.2]">
                   {heading}
-                </h4>
+                </h3>
                 <p className="font-sans text-iron-depth/80 text-[1.1rem] leading-[1.5]">
                   {body}
                 </p>

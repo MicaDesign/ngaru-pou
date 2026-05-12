@@ -16,7 +16,7 @@ const inter = Inter({
 const ngaMihi = localFont({
   src: "./fonts/NgaMihi.ttf",
   variable: "--font-nga-mihi",
-  display: "swap",
+  display: "optional",
 });
 
 const SITE_URL = "https://www.ngarupou.org.au";

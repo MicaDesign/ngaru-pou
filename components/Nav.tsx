@@ -98,7 +98,9 @@ export default function Nav() {
 
   const displayName = getDisplayName(member);
 
-  const authButtons = checking ? null : member ? (
+  const authButtons = checking ? (
+    <div className="h-8 w-[144px]" aria-hidden="true" />
+  ) : member ? (
     <div ref={userMenuRef} className="relative">
       <button
         onClick={() => setUserMenuOpen((v) => !v)}
@@ -172,7 +174,9 @@ export default function Nav() {
     </>
   );
 
-  const mobileAuthButtons = checking ? null : member ? (
+  const mobileAuthButtons = checking ? (
+    <div className="h-12 w-full" aria-hidden="true" />
+  ) : member ? (
     <>
       <Link
         href="/dashboard"
