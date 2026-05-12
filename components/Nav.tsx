@@ -11,7 +11,7 @@ import {
   LayoutDashboard,
   BookOpen,
   LogOut,
-  Disc2,
+  LoaderPinwheel,
 } from "lucide-react";
 import { getMemberstack } from "@/lib/memberstack";
 import { isKaiako } from "@/lib/kaiako";
@@ -262,7 +262,7 @@ export default function Nav() {
                   : "border-white/15 text-white/60 hover:border-white/30 hover:text-white"
               }`}
             >
-              <Disc2 size={16} />
+              <LoaderPinwheel size={16} />
             </Link>
           )}
           {member?.id && <NavBell memberId={member.id} />}
