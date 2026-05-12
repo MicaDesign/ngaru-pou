@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, Plus, Minus, X, Trash2 } from "lucide-react";
+import { Search, Plus, Minus, X, Trash2, Shuffle } from "lucide-react";
 import { KAIAKO_PLAN_ID } from "@/lib/kaiako";
 import { getStudents, fullName } from "@/lib/studentRegistry";
 import { memberFullName, getTeacherMembers } from "@/lib/teacherMembers";
@@ -128,7 +128,20 @@ export default function SpinWheel() {
           });
         }
 
-        setPeople(list);
+        // Deduplicate by name (case-insensitive) — the student_registry
+        // can have duplicate rows, and some people appear in both the
+        // registry and MemberStack. Prefer the first occurrence found.
+        const seen = new Set<string>();
+        const unique: Person[] = [];
+        for (const p of list) {
+          const key = p.name.toLowerCase().trim();
+          if (key && !seen.has(key)) {
+            seen.add(key);
+            unique.push(p);
+          }
+        }
+
+        setPeople(unique);
       } catch (err) {
         console.error("SpinWheel: failed to load participants", err);
       } finally {
@@ -317,6 +330,17 @@ export default function SpinWheel() {
     setWinner(null);
   }
 
+  function shuffleEntries() {
+    setEntries((prev) => {
+      const arr = [...prev];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    });
+  }
+
   // ── Filtering ─────────────────────────────────────────────────────────────
 
   const filtered = people.filter((p) =>
@@ -483,14 +507,24 @@ export default function SpinWheel() {
           />
         </div>
 
-        {/* Spin button */}
-        <button
-          onClick={spin}
-          disabled={spinning || totalSegments === 0}
-          className="h-14 px-12 rounded-xl font-sans font-semibold text-base bg-primary text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:enabled:-translate-y-0.5 hover:enabled:bg-primary/90"
-        >
-          {spinning ? "Spinning…" : "Spin!"}
-        </button>
+        {/* Spin + Randomise buttons */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={spin}
+            disabled={spinning || totalSegments === 0}
+            className="h-14 px-12 rounded-xl font-sans font-semibold text-base bg-primary text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 ease-[cubic-bezier(.165,.84,.44,1)] hover:enabled:-translate-y-0.5 hover:enabled:bg-primary/90"
+          >
+            {spinning ? "Spinning…" : "Spin!"}
+          </button>
+          <button
+            onClick={shuffleEntries}
+            disabled={spinning || entries.length < 2}
+            title="Randomise order"
+            className="h-14 w-14 flex items-center justify-center rounded-xl border border-white/15 text-white/50 disabled:opacity-30 disabled:cursor-not-allowed hover:enabled:border-primary hover:enabled:text-primary transition-all duration-200"
+          >
+            <Shuffle size={20} />
+          </button>
+        </div>
 
         {/* Current entries */}
         {entries.length > 0 && (
