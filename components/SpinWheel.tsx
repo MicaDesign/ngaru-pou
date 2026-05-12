@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, Plus, Minus, X, Trash2, Shuffle } from "lucide-react";
+import { Search, Plus, Minus, X, Trash2, Shuffle, PartyPopper } from "lucide-react";
 import { KAIAKO_PLAN_ID } from "@/lib/kaiako";
 import { getStudents, fullName } from "@/lib/studentRegistry";
 import { memberFullName, getTeacherMembers } from "@/lib/teacherMembers";
@@ -602,14 +602,14 @@ export default function SpinWheel() {
               exit={{ scale: 0.8, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 320, damping: 26 }}
             >
-              {/* Confetti emoji */}
+              {/* Party icon */}
               <motion.div
-                className="text-6xl mb-5 select-none"
+                className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 text-primary mx-auto mb-5"
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 500, damping: 18, delay: 0.08 }}
               >
-                🎉
+                <PartyPopper size={32} />
               </motion.div>
 
               <motion.h2

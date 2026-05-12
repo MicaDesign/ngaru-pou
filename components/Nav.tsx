@@ -22,6 +22,7 @@ import { getMemberAvatarUrl } from "@/lib/avatars";
 const navLinks = [
   { label: "Levels", href: "/dashboard/levels" },
   { label: "How It Works", href: "/how-it-works" },
+  { label: "Blog", href: "/blog" },
   { label: "About Us", href: "/about-us" },
 ];
 

@@ -8,6 +8,8 @@ const TABLES = {
   schedule: "tbli6ErkVxCQzmxj8",
   videos: "tbluk5AFITvkim2DS",
   reflectionPrompts: "tbla4etpK0iy11Asa",
+  gallery: "tblL0F2XyNOyqlCQd",
+  blogPosts: "tblt27q3RZ4a3eS4q",
 } as const;
 
 type AirtableRecord = {
@@ -311,4 +313,94 @@ export async function getLessonByWeek(
 ): Promise<Lesson | null> {
   const lessons = await getLessonsForLevel(level);
   return lessons.find((l) => l.weekNumber === week) ?? null;
+}
+
+// ─── Gallery ──────────────────────────────────────────────────────────────────
+
+export type GalleryItem = {
+  id: string;
+  title: string;
+  type: "Photo" | "Video" | "";
+  photo?: Attachment[];
+  videoUrl: string;
+  thumbnail?: Attachment[];
+  caption: string;
+  order: number;
+  isPublished: boolean;
+};
+
+function parseGalleryItem(r: AirtableRecord): GalleryItem {
+  const f = r.fields;
+  const rawType = str(f["Type"]);
+  const type: GalleryItem["type"] =
+    rawType === "Photo" ? "Photo" : rawType === "Video" ? "Video" : "";
+  return {
+    id: r.id,
+    title: str(f["Title"]),
+    type,
+    photo: attachments(f["Photo"]),
+    videoUrl: str(f["Video URL"]),
+    thumbnail: attachments(f["Thumbnail"]),
+    caption: str(f["Caption"]),
+    order: num(f["Order"]),
+    isPublished: bool(f["Is Published"]),
+  };
+}
+
+export async function getGalleryItems(): Promise<GalleryItem[]> {
+  const records = await fetchRecords(TABLES.gallery, {
+    filterByFormula: `{Is Published} = TRUE()`,
+    sort: JSON.stringify([{ field: "Order", direction: "asc" }]),
+  });
+  return records.map(parseGalleryItem);
+}
+
+// ─── Blog Posts ───────────────────────────────────────────────────────────────
+
+export type BlogPost = {
+  id: string;
+  title: string;
+  slug: string;
+  author: string;
+  category: string;
+  publishedDate: string;
+  coverImage?: Attachment[];
+  excerpt: string;
+  content: string;
+  isPublished: boolean;
+};
+
+function parseBlogPost(r: AirtableRecord): BlogPost {
+  const f = r.fields;
+  return {
+    id: r.id,
+    title: str(f["Title"]),
+    slug: str(f["Slug"]),
+    author: str(f["Author"]),
+    category: typeof f["Category"] === "object" && f["Category"] !== null
+      ? str((f["Category"] as Record<string, unknown>)["name"])
+      : str(f["Category"]),
+    publishedDate: str(f["Published Date"]),
+    coverImage: attachments(f["Cover Image"]),
+    excerpt: str(f["Excerpt"]),
+    content: str(f["Content"]),
+    isPublished: bool(f["Is Published"]),
+  };
+}
+
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  const records = await fetchRecords(TABLES.blogPosts, {
+    filterByFormula: `{Is Published} = TRUE()`,
+    sort: JSON.stringify([{ field: "Published Date", direction: "desc" }]),
+  });
+  return records.map(parseBlogPost);
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const escaped = slug.replace(/"/g, '\\"');
+  const records = await fetchRecords(TABLES.blogPosts, {
+    filterByFormula: `AND({Slug} = "${escaped}", {Is Published} = TRUE())`,
+    maxRecords: "1",
+  });
+  return records.length ? parseBlogPost(records[0]) : null;
 }
