@@ -6,6 +6,31 @@ import { Play, Camera, Film } from "lucide-react";
 import FadeUp from "@/components/FadeUp";
 import type { GalleryItem } from "@/lib/airtable";
 
+// Convert a Vimeo page URL (including unlisted hash tokens) to an embed URL.
+// Handles:  https://vimeo.com/123456789/abcdef1234?...
+//           https://vimeo.com/123456789
+function getVimeoEmbedUrl(url: string): string | null {
+  if (!url || url === "#") return null;
+  try {
+    const u = new URL(url);
+    // pathname looks like  /1191422394/5463c56625  or just  /1191422394
+    const parts = u.pathname.replace(/^\//, "").split("/");
+    const videoId = parts[0];
+    const hash = parts[1] ?? "";
+    if (!videoId) return null;
+    const params = new URLSearchParams({
+      autoplay: "1",
+      byline: "0",
+      title: "0",
+      portrait: "0",
+      ...(hash ? { h: hash } : {}),
+    });
+    return `https://player.vimeo.com/video/${videoId}?${params.toString()}`;
+  } catch {
+    return null;
+  }
+}
+
 // ─── Dummy content (shown until real Airtable items are published) ─────────────
 
 const DUMMY_PHOTOS: GalleryItem[] = [
@@ -42,6 +67,7 @@ type Props = {
 
 export default function GallerySection({ items }: Props) {
   const [tab, setTab] = useState<"photos" | "videos">("photos");
+  const [playingId, setPlayingId] = useState<string | null>(null);
 
   const livePhotos = items.filter((i) => i.type === "Photo" && i.photo?.[0]?.url);
   const liveVideos = items.filter((i) => i.type === "Video");
@@ -65,7 +91,7 @@ export default function GallerySection({ items }: Props) {
             {(["photos", "videos"] as const).map((t) => (
               <button
                 key={t}
-                onClick={() => setTab(t)}
+                onClick={() => { setTab(t); setPlayingId(null); }}
                 className={`px-5 py-2 rounded-lg font-sans text-sm font-medium transition-all duration-200 ${
                   tab === t
                     ? "bg-primary text-white shadow-sm"
@@ -118,35 +144,54 @@ export default function GallerySection({ items }: Props) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {videos.map((item, i) => {
                 const thumbUrl = item.thumbnail?.[0]?.url;
+                const embedUrl = getVimeoEmbedUrl(item.videoUrl);
+                const isPlaying = playingId === item.id;
+
                 return (
-                  <a
+                  <div
                     key={item.id}
-                    href={item.videoUrl || "#"}
-                    target={item.videoUrl && item.videoUrl !== "#" ? "_blank" : undefined}
-                    rel="noopener noreferrer"
-                    className="group relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-iron-depth hover:border-primary transition-all duration-300 hover:-translate-y-1"
+                    className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-iron-depth transition-all duration-300 hover:-translate-y-1"
+                    style={{ borderColor: isPlaying ? "var(--color-primary, #2ca3bb)" : undefined }}
                   >
-                    {/* Thumbnail */}
-                    <div className="relative aspect-video overflow-hidden">
-                      {thumbUrl ? (
-                        <Image
-                          src={thumbUrl}
-                          alt={item.title}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    {/* Video area */}
+                    <div className="relative aspect-video overflow-hidden bg-black">
+                      {isPlaying && embedUrl ? (
+                        /* ── Inline Vimeo player ── */
+                        <iframe
+                          src={embedUrl}
+                          allow="autoplay; fullscreen; picture-in-picture"
+                          allowFullScreen
+                          className="absolute inset-0 w-full h-full"
+                          title={item.title}
                         />
                       ) : (
-                        <div
-                          className={`absolute inset-0 bg-gradient-to-br ${VIDEO_GRADIENTS[i % VIDEO_GRADIENTS.length]}`}
-                        />
+                        /* ── Thumbnail / play button ── */
+                        <button
+                          onClick={() => embedUrl && setPlayingId(item.id)}
+                          className="absolute inset-0 w-full h-full cursor-pointer"
+                          aria-label={`Play ${item.title}`}
+                        >
+                          {thumbUrl ? (
+                            <Image
+                              src={thumbUrl}
+                              alt={item.title}
+                              fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div
+                              className={`absolute inset-0 bg-gradient-to-br ${VIDEO_GRADIENTS[i % VIDEO_GRADIENTS.length]}`}
+                            />
+                          )}
+                          {/* Play button overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-14 h-14 rounded-full bg-black/40 backdrop-blur-sm border border-white/30 flex items-center justify-center group-hover:bg-primary/80 group-hover:border-primary transition-all duration-300 group-hover:scale-110">
+                              <Play size={22} className="text-white ml-1" fill="white" />
+                            </div>
+                          </div>
+                        </button>
                       )}
-                      {/* Play button */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center group-hover:bg-primary/80 group-hover:border-primary transition-all duration-300 group-hover:scale-110">
-                          <Play size={18} className="text-white ml-0.5" fill="white" />
-                        </div>
-                      </div>
                     </div>
 
                     {/* Info */}
@@ -160,7 +205,7 @@ export default function GallerySection({ items }: Props) {
                         </p>
                       )}
                     </div>
-                  </a>
+                  </div>
                 );
               })}
             </div>
