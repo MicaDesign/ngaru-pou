@@ -19,6 +19,7 @@ function getVimeoEmbedUrl(url: string): string | null {
     if (!videoId) return null;
     const params = new URLSearchParams({
       autoplay: "1",
+      loop: "1",
       byline: "0",
       title: "0",
       portrait: "0",
