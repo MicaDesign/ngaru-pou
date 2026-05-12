@@ -154,7 +154,7 @@ export default function GallerySection({ items }: Props) {
           {/* Videos grid */}
           {tab === "videos" && (
             <FadeUp key="videos">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {videos.map((item, i) => {
                   const thumbUrl = item.thumbnail?.[0]?.url;
                   const embedUrl = getVimeoEmbedUrl(item.videoUrl);
