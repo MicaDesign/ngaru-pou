@@ -4,6 +4,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "v5.airtableusercontent.com" },
       { protocol: "https", hostname: "dl.airtable.com" },
+      { protocol: "https", hostname: "i.vimeocdn.com" },
     ],
   },
 };
