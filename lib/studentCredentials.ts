@@ -1,29 +1,13 @@
 import "server-only";
-import { Redis } from "@upstash/redis";
 import bcrypt from "bcryptjs";
+import { createClient } from "@supabase/supabase-js";
 
 const BCRYPT_COST = 10;
 
-// Vercel's Upstash integration injects KV_REST_API_URL/TOKEN; bare Upstash
-// integrations use UPSTASH_REDIS_REST_URL/TOKEN. Accept either so the same
-// code works regardless of how the store was provisioned.
-const url =
-  process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL ?? "";
-const token =
-  process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN ?? "";
-
-let _redis: Redis | null = null;
-function redis(): Redis {
-  if (!_redis) {
-    if (!url || !token) {
-      throw new Error(
-        "Upstash Redis env vars not set (KV_REST_API_URL/TOKEN or UPSTASH_REDIS_REST_URL/TOKEN).",
-      );
-    }
-    _redis = new Redis({ url, token });
-  }
-  return _redis;
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
 
 export type StudentCredentials = {
   id: string;
@@ -34,10 +18,6 @@ export type StudentCredentials = {
   username: string;
   pin_hash: string;
 };
-
-function key(username: string): string {
-  return `student:${username.trim().toLowerCase()}`;
-}
 
 export async function hashPin(pin: string): Promise<string> {
   return bcrypt.hash(pin, BCRYPT_COST);
@@ -54,19 +34,53 @@ export async function comparePin(
 export async function writeCredentials(
   credentials: StudentCredentials,
 ): Promise<boolean> {
-  const result = await redis().set(key(credentials.username), credentials, {
-    nx: true,
+  const { error } = await supabase.from("student_credentials").insert({
+    username: credentials.username.trim().toLowerCase(),
+    pin_hash: credentials.pin_hash,
+    parent_member_id: credentials.parent_member_id,
+    first_name: credentials.first_name,
+    last_name: credentials.last_name,
+    level: credentials.level,
   });
-  return result === "OK";
+
+  if (error) {
+    // Postgres unique violation = username already taken
+    if (error.code === "23505") return false;
+    throw new Error(`writeCredentials: ${error.message}`);
+  }
+  return true;
 }
 
 export async function readCredentials(
   username: string,
 ): Promise<StudentCredentials | null> {
-  const value = await redis().get<StudentCredentials>(key(username));
-  return value ?? null;
+  const { data, error } = await supabase
+    .from("student_credentials")
+    .select("*")
+    .eq("username", username.trim().toLowerCase())
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") return null; // not found
+    throw new Error(`readCredentials: ${error.message}`);
+  }
+
+  return data
+    ? {
+        id: data.id as string,
+        username: data.username as string,
+        pin_hash: data.pin_hash as string,
+        parent_member_id: data.parent_member_id as string,
+        first_name: data.first_name as string,
+        last_name: data.last_name as string,
+        level: data.level as string,
+      }
+    : null;
 }
 
 export async function deleteCredentials(username: string): Promise<void> {
-  await redis().del(key(username));
+  await supabase
+    .from("student_credentials")
+    .delete()
+    .eq("username", username.trim().toLowerCase());
 }
