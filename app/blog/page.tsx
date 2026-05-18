@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarDays, User } from "lucide-react";
-import { getBlogPosts } from "@/lib/airtable";
+import { getBlogPosts } from "@/lib/supabase";
 import FadeUp from "@/components/FadeUp";
 
 export const metadata: Metadata = {

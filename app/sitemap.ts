@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getBlogPosts } from "@/lib/airtable";
+import { getBlogPosts } from "@/lib/supabase";
 
 const BASE = "https://www.ngarupou.org.au";
 

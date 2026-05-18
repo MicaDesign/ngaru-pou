@@ -5,7 +5,7 @@ import IdentitySection from "@/components/IdentitySection";
 import EngageSection from "@/components/EngageSection";
 import CommunitySection from "@/components/CommunitySection";
 import GallerySection from "@/components/GallerySection";
-import { getGalleryItems, type GalleryItem } from "@/lib/airtable";
+import { getGalleryItems, type GalleryItem } from "@/lib/supabase";
 
 export const metadata: Metadata = {
   title: {

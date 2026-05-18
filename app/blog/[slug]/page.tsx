@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarDays, User, ArrowLeft } from "lucide-react";
-import { getBlogPostBySlug, getBlogPosts } from "@/lib/airtable";
+import { getBlogPostBySlug, getBlogPosts } from "@/lib/supabase";
 
 type Props = { params: { slug: string } };
 
